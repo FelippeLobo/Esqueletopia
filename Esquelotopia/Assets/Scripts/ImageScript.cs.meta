@@ -3,7 +3,9 @@ guid: 9facd76aafe30a14693ddc1a44be5f06
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - salaObj: {instanceID: 0}
+  - imagemSalaInicial: {fileID: 21300000, guid: 8467e1f58306e2a4f9fb7073a4f2b1a1, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

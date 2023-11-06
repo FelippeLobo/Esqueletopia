@@ -12,117 +12,21 @@ EditorBuildSettings:
     path: Assets/Scenes/Mapa.unity
     guid: 30010decec0b8ff47a8769249216fe47
   - enabled: 1
+    path: Assets/Scenes/Maze.unity
+    guid: 858022a5b231a904e8326e76a5a2b1b2
+  - enabled: 1
     path: Assets/Scenes/Sala.unity
     guid: 55272c8ca5ca7e94b9d36f816e48dab4
-  - enabled: 0
-    path: Assets/Scenes/Sala2.unity
-    guid: 13f38d59054e3fd4aa31d6db4ecd6397
   - enabled: 1
-    path: Assets/Scenes/Sala 2.unity
-    guid: 848354517b340964098d6b32083f3a44
+    path: Assets/Scenes/Maze 4.unity
+    guid: 2e4528fa4a85acc4eaa8419d97bebdc5
   - enabled: 1
-    path: Assets/Scenes/Sala 3.unity
-    guid: 0a7ae134c090adc42be4c7a193b82df6
+    path: Assets/Scenes/Maze 1.unity
+    guid: 5a866b4412fb364418f80f12beb66b7c
   - enabled: 1
-    path: Assets/Scenes/Sala 1.unity
-    guid: a3051927d7f51b6499e35a1c2b2c1429
+    path: Assets/Scenes/Maze 2.unity
+    guid: ea0c5529e09d92a40a5a24baf3fd52be
   - enabled: 1
-    path: Assets/Scenes/Sala 4.unity
-    guid: ce5a6ee3653344840b987bf3e5b254bc
-  - enabled: 1
-    path: Assets/Scenes/Sala 5.unity
-    guid: 880ef1daf67210b41bf17a5199d2a270
-  - enabled: 1
-    path: Assets/Scenes/Sala 6.unity
-    guid: 0fa4285572b2dd643bbb21073cfabde0
-  - enabled: 1
-    path: Assets/Scenes/Sala 7.unity
-    guid: d001e0e05dc0cfb46a6f9492cffd1c80
-  - enabled: 1
-    path: Assets/Scenes/Sala 8.unity
-    guid: 88aa6c9600ca1c7448a0816622e57112
-  - enabled: 1
-    path: Assets/Scenes/Sala 9.unity
-    guid: bb90c67cb04217e48946294950bceddf
-  - enabled: 1
-    path: Assets/Scenes/Sala 10.unity
-    guid: a6fdea27b03b7824b83dbffda6bd4f60
-  - enabled: 1
-    path: Assets/Scenes/Sala 11.unity
-    guid: f24d9a8c5e8fe9949a5b8b5c1a26476b
-  - enabled: 1
-    path: Assets/Scenes/Sala 12.unity
-    guid: 60966ed14627b344da36e8c807e46fb3
-  - enabled: 1
-    path: Assets/Scenes/Sala 13.unity
-    guid: 164eb9df0d647c340bbaa6d825d66fdd
-  - enabled: 1
-    path: Assets/Scenes/Sala 29.unity
-    guid: cba7fb072a6ab1c4bb56071b1be12622
-  - enabled: 1
-    path: Assets/Scenes/Sala 28.unity
-    guid: ab9eb577dddbf73418b697896a022ea0
-  - enabled: 1
-    path: Assets/Scenes/Sala 27.unity
-    guid: cf9ae73e28e9fa94287bf0e3a4ba5d80
-  - enabled: 1
-    path: Assets/Scenes/Sala 26.unity
-    guid: 835878bb784bf894a82ea4d2b6ec9239
-  - enabled: 1
-    path: Assets/Scenes/Sala 25.unity
-    guid: 7d285a88c34ff1f41965e83c02c99394
-  - enabled: 1
-    path: Assets/Scenes/Sala 24.unity
-    guid: c1a6e6f781b820545a9ce0aee77dde30
-  - enabled: 1
-    path: Assets/Scenes/Sala 23.unity
-    guid: f847b90be092d9243bb9d0743106677d
-  - enabled: 1
-    path: Assets/Scenes/Sala 22.unity
-    guid: 12eee7e0fbdd0f74d943c127f3ec503d
-  - enabled: 1
-    path: Assets/Scenes/Sala 21.unity
-    guid: 3996221348f45764fbaf45403f89890d
-  - enabled: 1
-    path: Assets/Scenes/Sala 20.unity
-    guid: d2eaba91395246141bbe4269cd988458
-  - enabled: 1
-    path: Assets/Scenes/Sala 36.unity
-    guid: f3f18a94efeed9841ab3f815cb3335c5
-  - enabled: 1
-    path: Assets/Scenes/Sala 35.unity
-    guid: 979b2616787e0b048ba4812e110637e1
-  - enabled: 1
-    path: Assets/Scenes/Sala 19.unity
-    guid: 50369b2fe33d8e941933e672fd8075d7
-  - enabled: 1
-    path: Assets/Scenes/Sala 18.unity
-    guid: 59cbe02a0764d864da886b7c23a8497b
-  - enabled: 1
-    path: Assets/Scenes/Sala 34.unity
-    guid: 807eb75e9019df04e933531fe06d8e99
-  - enabled: 1
-    path: Assets/Scenes/Sala 33.unity
-    guid: 516cdc05acceaf84fa83f513386cb0c9
-  - enabled: 1
-    path: Assets/Scenes/Sala 17.unity
-    guid: c8c13f99b2226c74f8efd345d57580bf
-  - enabled: 1
-    path: Assets/Scenes/Sala 16.unity
-    guid: ed84032ae71e0e74b9a3ea7961a4e845
-  - enabled: 1
-    path: Assets/Scenes/Sala 32.unity
-    guid: d3e660a5166c5344fafcd62166a2a33b
-  - enabled: 1
-    path: Assets/Scenes/Sala 31.unity
-    guid: 3b1155f06436e56448534316879d3950
-  - enabled: 1
-    path: Assets/Scenes/Sala 15.unity
-    guid: 5a6c9712c920104498e077e439723c7e
-  - enabled: 1
-    path: Assets/Scenes/Sala 14.unity
-    guid: 165c35748506b3249b0af2b3c1f37184
-  - enabled: 1
-    path: Assets/Scenes/Sala 30.unity
-    guid: 844da28d38de5654faddf2159555a4f9
+    path: Assets/Scenes/Maze 3.unity
+    guid: b2e95bca85d8f6243981e192d02334e7
   m_configObjects: {}

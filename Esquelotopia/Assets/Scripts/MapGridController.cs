@@ -6,58 +6,273 @@ using UnityEngine.UI;
 
 public class MapGridController : MonoBehaviour
 {
-    public static int MATRIX_SIZE = 6;
-
+    public GameObject gridTile;
+    public static int MATRIX_SIZE_X = 7;
+    public static int MATRIX_SIZE_Y = 18;
     private static GameObject instance = null;
-
     public static int visitedCounter = 0;
     private static int[] instancePosition;
-    public static GameObject[][] visitedObjects;
+    public static int[] visitedI = new int[999];
+    public static int[] visitedJ = new int[999];
     public int selectedCounter;
-    public GameObject salaInicial;
     public static GameObject salaAtualObj;
     public static int interationCounter = 0;
-    public string salaSelecionadaNome;
-    public GameObject salaSelecionadaObj = null;
-    public GameObject sala1, sala2, sala3, sala4, sala5, sala6;
-    public GameObject sala7, sala8, sala9, sala10, sala11, sala12, sala13, sala14;
-    public GameObject sala15, sala16, sala17, sala18, sala19, sala20, sala21, sala22;
-    public GameObject sala23, sala24, sala25, sala26, sala27, sala28, sala29, sala30;
-    public GameObject sala31, sala32, sala33, sala34, sala35, sala36;
-    public static GameObject[][] map = new GameObject[MATRIX_SIZE][];
-    public static string[,] mapScenes = {{"Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5", "Sala 6"},
-                                {"Sala 7", "Sala 8", "Sala 9", "Sala 10", "Sala 11", "Sala 12"},
-                                {"Sala 13", "Sala 14", "Sala 15", "Sala 16", "Sala 17", "Sala 18"},
-                                {"Sala 19", "Sala 20", "Sala 21", "Sala 22", "Sala 23", "Sala 24"},
-                                {"Sala 25", "Sala 26", "Sala 27", "Sala 28", "Sala 29", "Sala 30"},
-                                {"Sala 31", "Sala 32", "Sala 33", "Sala 34", "Sala 35", "Sala 36"}};
+    public static GameObject salaSelecionadaObj;
+    public static GameObject[][] map = new GameObject[MATRIX_SIZE_X][];
+    public static int[][] ObjectsMap = new int[MATRIX_SIZE_X][];
+    public static bool lockScale = false;
+    public static int pathTaken = 0;
 
-    //private static string salaAtual;
-    public void Start(){
+    public async void Start(){
         DontDestroyOnLoad(gameObject);
-        Debug.Log(interationCounter);
-        Debug.Log(salaAtualObj);
-        visitedObjects = new GameObject[MATRIX_SIZE][];
-        inicializador();
+        InstantiateMap();
+        InstantiateObjects();
         if(instance == null){
             instance = this.gameObject;
-            salaAtualObj = sala24;
+            salaAtualObj = map[3][0];
             IniciaSalaInicial(salaAtualObj);
         } else {
             DestroyObject(instance);
             instance = this.gameObject;
-            Debug.Log(salaAtualObj);
             InstanciaSalaAtual(instancePosition);
         }
         if(interationCounter == 0){
         }
         else if(interationCounter > 1){
         }
-        //DontDestroyOnLoad(salaAtualObj);
         selectedCounter = 0;
         interationCounter += 1;
+        lockScale = false;
+    }
+
+    public void InstantiateObjects(){
+        GameObject MapGrid = GameObject.Find("MapGrid");
+        float posX = MapGrid.transform.position.x-424;
+        float posXInicial = MapGrid.transform.position.x-424;
+        float posY = MapGrid.transform.position.y+167;
+        float tamTile = 50;
+        for(int i = 0; i < MATRIX_SIZE_X; i++){
+            map[i] = new GameObject[MATRIX_SIZE_Y];
+            for(int j = 0; j < MATRIX_SIZE_Y; j++){
+                map[i][j] = Instantiate(gridTile, MapGrid.transform);
+                map[i][j].transform.position = new Vector3(posX, posY, 0);
+                posX = posX + tamTile;
+            }
+            posX = posXInicial;
+            posY = posY - tamTile;
+        }
     }
     
+    public void InstantiateMap(){
+        // 0 blocked tiles
+        // 1 path tiles
+        // 2 initial tile
+        // 30 chest 0
+        // 31 chest 1
+        // 32 chest 2
+        // 33 chest 3
+        // 34 chest 4
+        // 4 campfire
+        // 5 combat
+        // 6 boss
+        // 7 shop
+        // 8 visited/closed path
+        
+        switch(pathTaken) 
+            {
+            case 0:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 1, 5, 1, 1, 5, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 5, 0, 0, 0, 31, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 5, 1, 5, 1, 5, 1, 5, 1, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 1, 0, 0, 0, 0, 0, 0, 4, 7, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 5, 1, 5, 1, 5, 1, 1, 1, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 30, 0, 0, 0, 5, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 5, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 1:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 1, 0, 0, 0, 0, 0, 0, 4, 7, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 5, 1, 5, 1, 5, 1, 1, 1, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 30, 0, 0, 0, 5, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 5, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 2:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 1, 5, 1, 1, 5, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 5, 0, 0, 0, 31, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 5, 1, 5, 1, 5, 1, 5, 1, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 1, 0, 0, 0, 0, 0, 0, 4, 7, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 3:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 1, 0, 0, 0, 0, 0, 0, 4, 7, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 5, 1, 5, 1, 5, 1, 1, 1, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 4:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 1, 0, 0, 0, 0, 0, 0, 4, 7, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 5, 1, 5, 8, 8, 8, 1, 1, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 30, 0, 0, 0, 5, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 5, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 5:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 5, 1, 5, 1, 5, 1, 5, 1, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 1, 0, 0, 0, 0, 0, 0, 4, 7, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 6:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 1, 5, 1, 1, 5, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 5, 0, 0, 0, 31, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 5, 1, 5, 8, 8, 8, 5, 1, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 1, 0, 0, 0, 0, 0, 0, 4, 7, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 7:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 8, 0, 0, 0, 0, 0, 0, 8, 8, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 8:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 32, 1, 5, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 1, 0, 4, 7, 5, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 0, 0, 0, 34, 5, 1, 0};
+                ObjectsMap[3] = new int[18] {2, 8, 0, 0, 0, 0, 0, 0, 8, 8, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 8, 8, 0, 0, 8, 8, 8, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8, 8, 8, 8, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            case 9:
+                ObjectsMap[0] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 8, 8, 8, 0, 0, 0, 0, 0};
+                ObjectsMap[1] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 8, 0, 8, 8, 8, 0, 0, 0};
+                ObjectsMap[2] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 8, 0, 0, 0, 8, 8, 8, 0};
+                ObjectsMap[3] = new int[18] {2, 8, 0, 0, 0, 0, 0, 0, 8, 8, 1, 0, 0, 0, 0, 0, 4, 6};
+                ObjectsMap[4] = new int[18] {0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 5, 1, 0, 0, 5, 7, 1, 0};
+                ObjectsMap[5] = new int[18] {0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 1, 33, 5, 1, 0, 0, 0};
+                ObjectsMap[6] = new int[18] {0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void verifyPathTaken(int[] pathPosition){
+        int pathX = pathPosition[0];
+        int pathY = pathPosition[1];
+        if(pathX == 4 && pathY == 1){
+            pathTaken = 1;
+        }
+        else if(pathX == 2 && pathY == 1){
+            pathTaken = 2;
+        }
+        else if(pathX == 4 && pathY == 4){
+            pathTaken = 3;
+        }
+        else if(pathX == 5 && pathY == 3){
+            pathTaken = 4;
+        }
+        else if(pathX == 2 && pathY == 4){
+            pathTaken = 5;
+        }
+        else if(pathX == 1 && pathY == 3){
+            pathTaken = 6;
+        }
+        else if(pathX == 3 && pathY == 9){
+            pathTaken = 7;
+        }
+        else if(pathX == 2 && pathY == 10){
+            pathTaken = 8;
+        }
+        else if(pathX == 4 && pathY == 10){
+            pathTaken = 9;
+        }
+    }
+
+    public void StartMap(){
+        for(int i = 0; i < MATRIX_SIZE_X; i++){
+            for(int j = 0; j < MATRIX_SIZE_Y; j++){
+                switch(ObjectsMap[i][j]) 
+                {
+                case 0:
+                    ImageScript tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "blocked";
+                    tile.bloqueado = true;
+                    break;
+                case 1:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "path";
+                    break;
+                case 2:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "initial";
+                    break;
+                case 30:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "chest0";
+                    break;
+                case 31:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "chest1";
+                    break;
+                case 32:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "chest2";
+                    break;
+                case 33:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "chest3";
+                    break;
+                case 34:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "chest4";
+                    break;
+                case 4:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "campfire";
+                    break;
+                case 5:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "fight";
+                    break;
+                case 6:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "boss";
+                    break;
+                case 7:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "shop";
+                    break;
+                case 8:
+                    tile = map[i][j].GetComponent<ImageScript>();
+                    tile.tileType = "path";
+                    tile.visitado = true;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+
     public void SetAtiveToFalse(){
         this.gameObject.SetActive(false);
         GameObject a = GameObject.Find("ButtonAvancar");
@@ -70,53 +285,7 @@ public class MapGridController : MonoBehaviour
         salaAtualObj= map[pos[0]][pos[1]];
         ImageScript salaInicial = salaAtualObj.GetComponent<ImageScript>();
         salaInicial.ativo = true;
-        salaInicial.atual = true;
         salaInicial.visitado = true;
-        UpdateActives(salaAtualObj);
-    }
-    public void inicializador(){
-        sala1 = GameObject.Find("Image (0)");
-        sala2 = GameObject.Find("Image (1)");
-        sala3 = GameObject.Find("Image (2)");
-        sala4 = GameObject.Find("Image (3)");
-        sala5 = GameObject.Find("Image (4)");
-        sala6 = GameObject.Find("Image (5)");
-        sala7 = GameObject.Find("Image (6)");
-        sala8 = GameObject.Find("Image (7)");
-        sala9 = GameObject.Find("Image (8)");
-        sala10 = GameObject.Find("Image (9)");
-        sala11 = GameObject.Find("Image (10)");
-        sala12 = GameObject.Find("Image (11)");
-        sala13 = GameObject.Find("Image (12)");
-        sala14 = GameObject.Find("Image (13)");
-        sala15 = GameObject.Find("Image (14)");
-        sala16 = GameObject.Find("Image (15)");
-        sala17 = GameObject.Find("Image (16)");
-        sala18 = GameObject.Find("Image (17)");
-        sala19 = GameObject.Find("Image (18)");
-        sala20 = GameObject.Find("Image (19)");
-        sala21 = GameObject.Find("Image (20)");
-        sala22 = GameObject.Find("Image (21)");
-        sala23 = GameObject.Find("Image (22)");
-        sala24 = GameObject.Find("Image (23)");
-        sala25 = GameObject.Find("Image (24)");
-        sala26 = GameObject.Find("Image (25)");
-        sala27 = GameObject.Find("Image (26)");
-        sala28 = GameObject.Find("Image (27)");
-        sala29 = GameObject.Find("Image (28)");
-        sala30 = GameObject.Find("Image (29)");
-        sala31 = GameObject.Find("Image (30)");
-        sala32 = GameObject.Find("Image (31)");
-        sala33 = GameObject.Find("Image (32)");
-        sala34 = GameObject.Find("Image (33)");
-        sala35 = GameObject.Find("Image (34)");
-        sala36 = GameObject.Find("Image (35)");
-        map[0] = new GameObject[6]{sala1, sala2, sala3, sala4, sala5, sala6};
-        map[1] = new GameObject[6]{sala7, sala8, sala9, sala10, sala11, sala12};
-        map[2] = new GameObject[6]{sala13, sala14, sala15, sala16, sala17, sala18};
-        map[3] = new GameObject[6]{sala19, sala20, sala21, sala22, sala23, sala24};
-        map[4] = new GameObject[6]{sala25, sala26, sala27, sala28, sala29, sala30};
-        map[5] = new GameObject[6]{sala31, sala32, sala33, sala34, sala35, sala36};
     }
 
     public void IniciaSalaInicial(GameObject obj){
@@ -124,31 +293,45 @@ public class MapGridController : MonoBehaviour
         ImageScript salaInicial = obj.GetComponent<ImageScript>();
         salaInicial.ativo = true;
         salaInicial.atual = true;
-        salaInicial.visitado = true;
-        UpdateActives(obj);
     }
 
     public void sumSelecionado(GameObject obj){
         ImageScript img = obj.GetComponent<ImageScript>();
-        if(img.atual != true && img.visitado != true && img.ativo == true){
+        int[] objPos = FindMatrixPosition(obj);
+        if(img.atual != true && img.isVisited() != true && img.ativo == true && img.bloqueado == false){
+            zoomScale(objPos);
             if(selectedCounter > 0){
                 ClearSelecionado();
             }
-            int[] objPos = FindMatrixPosition(obj);
             salaSelecionadaObj = obj;
             img.selecionado = true;
             selectedCounter += 1;
-            salaSelecionadaNome = mapScenes[objPos[0],objPos[1]];
             GameObject buttonAvancar = GameObject.Find("ButtonAvancar");
             AvancarSala BTAScript = buttonAvancar.GetComponent<AvancarSala>();
             BTAScript.ativo = true;
         }
     }
 
+    public void zoomScale(int[] pos){      
+        if(lockScale == false){
+            GameObject mapGrid = GameObject.Find("MapGrid");
+            mapGrid.transform.localScale = new Vector3(1.7f, 1.7f, 1);
+            float newPosX;
+            if((pos[1]-1) > 6){
+                newPosX = mapGrid.transform.position.x + 250f - (80 * 6);
+            }
+            else{
+                newPosX = mapGrid.transform.position.x + 250f - (80 * (pos[1]-1));
+            }
+            float newPosY = mapGrid.transform.position.y - 35f;
+            mapGrid.transform.position = new Vector3(newPosX ,newPosY , 0);
+            lockScale = true;
+        }
+    }
+
     public int[] FindMatrixPosition(GameObject obj){
-        for(int i = 0; i < 6; i++){
-            for(int j = 0; j < 6; j++){
-                //ImageScript imgs = map[i][j].GetComponent<ImageScript>();
+        for(int i = 0; i < MATRIX_SIZE_X; i++){
+            for(int j = 0; j < MATRIX_SIZE_Y; j++){
                 if(obj == map[i][j]){
                     return new[]{i, j};
                 }
@@ -159,24 +342,26 @@ public class MapGridController : MonoBehaviour
 
     public void ClearSelecionado(){
         selectedCounter = 0;
-        for(int i = 0; i < 6; i++){
-            for(int j = 0; j < 6; j++){
+        for(int i = 0; i < MATRIX_SIZE_X; i++){
+            for(int j = 0; j < MATRIX_SIZE_Y; j++){
                 ImageScript imgs = map[i][j].GetComponent<ImageScript>();
                 imgs.selecionado = false;
             }
         }
     }
 
-    public void ClearAtual(){
-        for(int i = 0; i < 6; i++){
-            for(int j = 0; j < 6; j++){
-                ImageScript imgs = map[i][j].GetComponent<ImageScript>();
-                imgs.atual = false;
-            }
+    public void CheckVisited(){
+        for(int k = 0; k < visitedCounter; k++){
+            ImageScript img = map[visitedI[k]][visitedJ[k]].GetComponent<ImageScript>();
+            img.visitado = true;            
         }
     }
 
-    public void UpdateActives(GameObject salaAtual){
+    public void activateActualNeighbours(GameObject salaAtual){
+        ImageScript salaAtualObj = salaAtual.GetComponent<ImageScript>();
+        salaAtualObj.atual = true;
+        salaAtualObj.visitado = true;
+
         int[] pos = FindMatrixPosition(salaAtual);
         int linha = pos[0];
         int coluna = pos[1];
@@ -188,25 +373,25 @@ public class MapGridController : MonoBehaviour
                 imgs = map[linha][coluna+1].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
             }
-            else if(linha == MATRIX_SIZE-1 && coluna == MATRIX_SIZE-1){
+            else if(linha == MATRIX_SIZE_Y-1 && coluna == MATRIX_SIZE_Y-1){
                 ImageScript imgs = map[linha-1][coluna].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
                 imgs = map[linha][coluna-1].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
             }
-            else if(linha == MATRIX_SIZE-1 && coluna == 0){
+            else if(linha == MATRIX_SIZE_Y-1 && coluna == 0){
                 ImageScript imgs = map[linha-1][coluna].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
                 imgs = map[linha][coluna+1].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
             }
-            else if(linha == 0 && coluna == MATRIX_SIZE-1){
+            else if(linha == 0 && coluna == MATRIX_SIZE_Y-1){
                 ImageScript imgs = map[linha+1][coluna].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
                 imgs = map[linha][coluna-1].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
             }
-            else if(linha > 0 && coluna == MATRIX_SIZE-1){
+            else if(linha > 0 && coluna == MATRIX_SIZE_Y-1){
                 ImageScript imgs = map[linha+1][coluna].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
                 imgs = map[linha-1][coluna].GetComponent<ImageScript>();
@@ -214,7 +399,7 @@ public class MapGridController : MonoBehaviour
                 imgs = map[linha][coluna-1].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
             }
-            else if(linha == MATRIX_SIZE-1 && coluna > 0){
+            else if(linha == MATRIX_SIZE_Y-1 && coluna > 0){
                 ImageScript imgs = map[linha-1][coluna].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
                 imgs = map[linha][coluna-1].GetComponent<ImageScript>();
@@ -227,8 +412,10 @@ public class MapGridController : MonoBehaviour
                 imgs.GetComponent<ImageScript>().ativo = true;
                 imgs = map[linha][coluna-1].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
-                imgs = map[linha+1][coluna].GetComponent<ImageScript>();
-                imgs.GetComponent<ImageScript>().ativo = true;
+                if(linha < MATRIX_SIZE_X-1){
+                    imgs = map[linha+1][coluna].GetComponent<ImageScript>();
+                    imgs.GetComponent<ImageScript>().ativo = true;
+                }
                 imgs = map[linha-1][coluna].GetComponent<ImageScript>();
                 imgs.GetComponent<ImageScript>().ativo = true;
             }
@@ -249,25 +436,70 @@ public class MapGridController : MonoBehaviour
                 imgs.GetComponent<ImageScript>().ativo = true;
             }
         }
-        //sala2.GetComponent<ImageScript>().ativo = true;
     }
 
     public void IrParaSala(string sala){
+        
+        GameObject salaAnterior = salaAtualObj;
         salaAtualObj = salaSelecionadaObj;
         instancePosition = FindMatrixPosition(salaAtualObj);
-        ClearAtual();
-        ImageScript img = salaAtualObj.GetComponent<ImageScript>();
-        img.atual = true;
-        visitedCounter++;
-        //SceneManager.LoadScene(salaSelecionadaNome);
-        SceneManager.LoadScene("Sala");
+        int[] lastInstancePosition = FindMatrixPosition(salaAnterior);
+        visitedI[visitedCounter] = lastInstancePosition[0];
+        visitedJ[visitedCounter] = lastInstancePosition[1];
+        visitedCounter += 1;
+        ImageScript salaAtual = salaAtualObj.GetComponent<ImageScript>();
+        salaAtual.atual = true;
+
+        verifyPathTaken(instancePosition);
+
+        switch(salaAtual.tileType) {
+            case "path":
+                SceneManager.LoadScene("Sala");
+                break;
+            case "initial":
+                SceneManager.LoadScene("Sala");
+                break;
+            case "chest0":
+                SceneManager.LoadScene("Maze");
+                break;
+            case "chest1":
+                SceneManager.LoadScene("Maze 1");
+                break;
+            case "chest2":
+                SceneManager.LoadScene("Maze 2");
+                break;
+            case "chest3":
+                SceneManager.LoadScene("Maze 3");
+                break;
+            case "chest4":
+                SceneManager.LoadScene("Maze 4");
+                break;
+            case "campfire":
+                SceneManager.LoadScene("Sala");
+                break;
+            case "fight":
+                SceneManager.LoadScene("Sala");
+                break;
+            case "boss":
+                SceneManager.LoadScene("Sala");
+                break;
+            case "shop":
+                SceneManager.LoadScene("Sala");
+                break;
+            default:
+                break;
+        }
     }
 
+    public void UpdateTilesStatus(GameObject salaAtual){
+        CheckVisited();
+        activateActualNeighbours(salaAtual);
+        StartMap();
+    }
+    
     void Update(){
         if(interationCounter != 0){
-            UpdateActives(salaAtualObj);
+            UpdateTilesStatus(salaAtualObj);
         }
-
     }
-
 }
