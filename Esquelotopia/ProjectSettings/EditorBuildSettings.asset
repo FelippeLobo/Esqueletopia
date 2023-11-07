@@ -29,4 +29,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Maze 3.unity
     guid: b2e95bca85d8f6243981e192d02334e7
+  - enabled: 1
+    path: Assets/Scenes/Backup.unity
+    guid: ccd4a2fd891aae24c90ee738507ed462
+  - enabled: 1
+    path: Assets/Scenes/Descanso.unity
+    guid: 585d742ea67dfc344bf5445430409fce
+  - enabled: 1
+    path: Assets/Scenes/Loading.unity
+    guid: 01f14d44670742f4a890322aac41ad36
+  - enabled: 1
+    path: Assets/Scenes/Shop.unity
+    guid: 18f96b7a87a581c4898ea3eab775bff8
+  - enabled: 1
+    path: Assets/Scenes/TelaDoJogador.unity
+    guid: bd64dbb78b73dc341a9791a4c2b2e739
   m_configObjects: {}

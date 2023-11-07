@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class ButtonUI : MonoBehaviour
 {
-    [SerializeField] private string novaSalaDoJogo = "Mapa";
+    [SerializeField] private string novaSalaDoJogo;
     public void StartGameButton()
     {
         SceneManager.LoadScene(novaSalaDoJogo);

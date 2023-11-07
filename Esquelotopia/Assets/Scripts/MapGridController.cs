@@ -475,7 +475,7 @@ public class MapGridController : MonoBehaviour
                 SceneManager.LoadScene("Maze 4");
                 break;
             case "campfire":
-                SceneManager.LoadScene("Sala");
+                SceneManager.LoadScene("Descanso");
                 break;
             case "fight":
                 SceneManager.LoadScene("Sala");
@@ -484,7 +484,7 @@ public class MapGridController : MonoBehaviour
                 SceneManager.LoadScene("Sala");
                 break;
             case "shop":
-                SceneManager.LoadScene("Sala");
+                SceneManager.LoadScene("Shop");
                 break;
             default:
                 break;
