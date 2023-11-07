@@ -161,6 +161,10 @@ public class Personagem : MonoBehaviour
         moedas+= valor;
     }
 
+    public void GanharXP(int valor){
+        proxLevelXp+=valor;
+    }
+
     public void ArmazenarItens(Item[] itens){
 
         for (var i = 0; i < itens.Length; i++)

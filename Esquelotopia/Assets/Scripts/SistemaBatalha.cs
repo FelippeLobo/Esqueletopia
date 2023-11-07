@@ -278,11 +278,27 @@ public class SistemaBatalha : MonoBehaviour
 
     }
  
-    void EndBattle(){
+    IEnumerator EndBattle(){
         if(estado ==  Estados.GANHOU){
             UpdateDialogueText("Você venceu a batalha!");
+            playerUnit.GuardarMoedas(250);
+            playerUnit.GanharXP(20);
+            UpdateDialogueText("Você ganhou $"+250+" moedas e "+20+"xp");
+            yield return new WaitForSeconds(timeActionsDialogue);
+         
+            SceneManager.LoadScene("Mapa");
+
         }else if (estado == Estados.PERDEU){
             UpdateDialogueText("Sua invocação foi derrotada!");
+
+            yield return new WaitForSeconds(timeActionsDialogue);
+            GameObject bag = GameObject.Find("Odin_bag");
+            GameObject battle = GameObject.Find("Odin_battle");
+            GameObject canvas = GameObject.Find("CanvasDerrota");
+
+            bag.SetActive(false);
+            battle.SetActive(false);
+            canvas.SetActive(true);
         }
     }
 
