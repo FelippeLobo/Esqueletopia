@@ -13,6 +13,8 @@ public class Inimigo : MonoBehaviour
     public float vidaAtual;
     public int ataque;
     public int defesa;
+    public int moedas;
+    public int xp;
 
 
       public HealthBar healthBar;
@@ -27,10 +29,25 @@ public class Inimigo : MonoBehaviour
     {
         
     }
+    public void LevelUpMonster(int lvl){
+        for (var i = 0; i < lvl; i++)
+        {   
+            level++;
+            vidaTotal+=10*level;
+            vidaAtual= vidaTotal;
+            ataque+=10*level;
+            defesa+=10*level;
+            moedas+=150*level;
+            xp+=15;
+        }
 
+    }
     public bool TakeDmg(float dano){
         
-        vidaAtual -= dano;
+        float danoMitigado =  (float)(Math.Ceiling((UnityEngine.Random.Range(0, (0.01f*level) * defesa/2))));
+        
+        vidaAtual -= (dano-danoMitigado);
+        
         healthBar.SetHealth(vidaAtual);
         if(vidaAtual <= 0)
             return true;

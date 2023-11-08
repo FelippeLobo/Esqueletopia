@@ -16,7 +16,7 @@ public class SistemaBatalha : MonoBehaviour
 
     public Transform playerPos;
     public Transform enemyPos;
-
+    public HealthBar playerHUD;
     private static float timeActionsDialogue = 1.3f;
     public static Personagem playerUnit;
     public Animator playerAnimator;
@@ -29,6 +29,11 @@ public class SistemaBatalha : MonoBehaviour
 
     public InimigoHUD inimigoHUD2;
     public InimigoHUD inimigoHUD3;
+
+    public GameObject inimigoPos1;
+
+    public GameObject inimigoPos2;
+    public GameObject inimigoPos3;
 
    public GameObject odinBag;
     public GameObject odinBattle;
@@ -43,45 +48,142 @@ public class SistemaBatalha : MonoBehaviour
   
     private InimigoHUD inimigoHUD;
 
-    
+    public GameObject canvas;
+    public GameObject vitoria;
     private int contDeath;
     public int[] enemyDeaths;
 
+    private List<GameObject> inimigos;
+    public GameObject backgrounds;
     void Start()
-    {    
-        playerUnit = GameObject.Find("Player").GetComponent<Personagem>();
-        enemyUnit1 = GameObject.Find("EnemyPos").transform.GetChild(0).gameObject.GetComponent<Inimigo>();
-        enemyUnit2 = GameObject.Find("EnemyPos2").transform.GetChild(0).gameObject.GetComponent<Inimigo>();
-        enemyUnit3 = GameObject.Find("EnemyPos3").transform.GetChild(0).gameObject.GetComponent<Inimigo>();
-        //playerUnit.ItemFactory();
+    {   
+
+        playerUnit = GameObject.Find("PersonagemStats").GetComponent<Personagem>(); 
+        playerUnit.healthBar = playerHUD;
+        int seedBackGround = (int)UnityEngine.Random.Range(1, 6);
+        
+        backgrounds.transform.GetChild(seedBackGround).gameObject.SetActive(true);
+        
+        SetEnemies();
+        
         enemyDeaths = new int[3];
         enemyDeaths[0] = 1;
         enemyDeaths[1] = 1;
         enemyDeaths[2] = 1;
         contDeath = 0;
-        playerAnimator = playerUnit.GetComponent<Animator>();
+        playerAnimator =  GameObject.Find("Player").GetComponent<Animator>();
         estado =  Estados.INICIO;
 
         StartCoroutine(SetupBatalha());
     }
+    void Update(){
+
+        if(Personagem.vidaAtual <= 0){
+            playerAnimator.SetBool("isDeath", true);
+            estado = Estados.PERDEU;
+            EndBattle();
+        }
+    }
+    void SetEnemies(){
+        inimigoPos1 = GameObject.Find("EnemyPos");
+        inimigoPos2 = GameObject.Find("EnemyPos2");
+        inimigoPos3 = GameObject.Find("EnemyPos3");
+
+        int[] inimigosSeed = new int[3];
+        UnityEngine.Debug.Log("LVL:"+Personagem.level);
+        if(Personagem.level < 3){
+            for (int i = 0; i < 3; i++)
+            {
+                inimigosSeed[i] =  (int)UnityEngine.Random.Range(1, 5);
+            }
+               
+        }
+
+        if(Personagem.level >= 3 && Personagem.level <= 6){
+            for (int i = 0; i < 3; i++)
+                {
+                    inimigosSeed[i] =  (int)UnityEngine.Random.Range(1, 8);
+                }
+
+        }
+
+        if(Personagem.level > 6 && Personagem.level <= 8){
+            for (int i = 0; i < 3; i++)
+                {
+                    inimigosSeed[i] =  (int)UnityEngine.Random.Range(5, 10);
+                }
+
+        }
+
+        if(Personagem.level > 8){
+            for (int i = 0; i < 3; i++)
+                {
+                    inimigosSeed[i] =  (int)UnityEngine.Random.Range(8, 12);
+                }
+
+        }
+
+        GameObject enemy1 =Instantiate(Resources.Load("Inimigo"+inimigosSeed[0], typeof(GameObject))) as GameObject;
+        GameObject enemy2 =Instantiate(Resources.Load("Inimigo"+inimigosSeed[1], typeof(GameObject))) as GameObject;
+        GameObject enemy3 =Instantiate(Resources.Load("Inimigo"+inimigosSeed[2], typeof(GameObject))) as GameObject;
+
+        enemy1.transform.position = inimigoPos1.transform.position;
+        enemy2.transform.position = inimigoPos2.transform.position;
+        enemy3.transform.position = inimigoPos3.transform.position;
+
+        enemy1.transform.position -= new Vector3(0, -50, 0);
+        enemy2.transform.position -= new Vector3(0, -50, 0);
+        enemy3.transform.position -= new Vector3(0, -50, 0);
+
+        enemy1.transform.parent = inimigoPos1.transform;
+        enemy2.transform.parent = inimigoPos2.transform;
+        enemy3.transform.parent = inimigoPos3.transform;
+
+        
+        
+        // enemy1.transform.localScale += new Vector3(2.5f, 2.5f, 0);
+        // enemy2.transform.localScale += new Vector3(2.5f, 2.5f, 0);
+        // enemy3.transform.localScale += new Vector3(2.5f, 2.5f, 0);
+
+        enemyUnit1 = enemy1.GetComponent<Inimigo>();
+        enemyUnit2 = enemy2.GetComponent<Inimigo>();
+        enemyUnit3 = enemy3.GetComponent<Inimigo>();
+
+        if(Personagem.level > 2){
+            enemyUnit1.LevelUpMonster((int)UnityEngine.Random.Range(1, Personagem.level+1));
+            enemyUnit2.LevelUpMonster((int)UnityEngine.Random.Range(1, Personagem.level+1));
+            enemyUnit3.LevelUpMonster((int)UnityEngine.Random.Range(1, Personagem.level+1));
+        }
+       
+        // enemyUnit1.LevelUpMonster(10);
+        // enemyUnit2.LevelUpMonster(10);
+        // enemyUnit3.LevelUpMonster(10);
+
+        enemyUnit1.healthBar = inimigoHUD1.transform.GetChild(0).gameObject.GetComponent<HealthBar>();
+        enemyUnit2.healthBar = inimigoHUD2.transform.GetChild(0).gameObject.GetComponent<HealthBar>();
+        enemyUnit3.healthBar = inimigoHUD3.transform.GetChild(0).gameObject.GetComponent<HealthBar>();
+
+
+
+    }
     void UpdateFromDataStore(){
         /*
         SistemaBatalha sb = instance.GetComponent<SistemaBatalha>();
-        float vda = sb.playerUnit.vidaAtual;
+        float vda = sb.Personagem.vidaAtual;
         Debug.Log(vda);
-        playerUnit = sb.playerUnit;
+        Personagem = sb.Personagem;
         enemyUnit1 = sb.enemyUnit1;
         enemyUnit2 = sb.enemyUnit2;
         enemyUnit3 = sb.enemyUnit3;
         enemyDeaths = sb.enemyDeaths;
         contDeath = sb.contDeath;
-        playerAnimator = playerUnit.GetComponent<Animator>();
+        playerAnimator = Personagem.GetComponent<Animator>();
         estado =  sb.estado;
         */
     }
     IEnumerator SetupBatalha(){
         //GameObject playerGo = Instantiate(playerPrefab, playerPos);
-        //playerUnit = playerGo.GetComponent<Personagem>();
+        //Personagem = playerGo.GetComponent<Personagem>();
 
        //GameObject enemyGo = Instantiate(enemyPrefab, enemyPos);
        //enemyUnit = enemyGo.GetComponent<Inimigo>();
@@ -112,8 +214,16 @@ public class SistemaBatalha : MonoBehaviour
         dialogueText1.text = info;
     }
 
-    public void OnAttackButton(GameObject panelButton, GameObject panelEnemy){
-        panelButton.SetActive(false);
+    public void OnAttackButton(GameObject panelEnemy){
+        for (var i = 0; i < 3; i++)
+        {
+            if(enemyDeaths[i] == 0){
+                panelEnemy.transform.GetChild(i).GetComponent<Button>().interactable = false;
+            }else{
+                panelEnemy.transform.GetChild(i).GetComponent<Button>().interactable = true;
+            }
+            
+        }
         panelEnemy.SetActive(true);
     }
     public void OnEnemyButton(int enemyID){
@@ -129,10 +239,18 @@ public class SistemaBatalha : MonoBehaviour
       
     }
 
-    public void Fugir(){
+    public void Fugir(GameObject buttonFugir){
+        float vidaAux = Personagem.vidaTotal * 0.25f;
+        Personagem.vidaAtual -= vidaAux;
+        if(Personagem.vidaAtual > 0){
+            Personagem.moedas -= (int)(Personagem.moedas * 0.1f );
+            buttonFugir.GetComponent<ButtonUI>().StartGameButton();
+        }else{
+            playerAnimator.SetBool("isDeath", true);
+            estado = Estados.PERDEU;
+            EndBattle();
+        }
 
-        float vidaAux = playerUnit.vidaTotal * 0.25f;
-        playerUnit.vidaAtual -= vidaAux;
         
     }
     IEnumerator PlayerAttack(int enemyID){
@@ -145,17 +263,17 @@ public class SistemaBatalha : MonoBehaviour
             case 0:
                 enemyUnit = enemyUnit1;
                 inimigoHUD = inimigoHUD1;
-                dmgText = GameObject.Find("EnemyPos").transform.GetChild(2).gameObject.GetComponent<DmgText>();
+                dmgText = GameObject.Find("EnemyPos").transform.GetChild(1).gameObject.GetComponent<DmgText>();
                 break;
             case 1:
                 enemyUnit = enemyUnit2;
                 inimigoHUD = inimigoHUD2;
-                dmgText = GameObject.Find("EnemyPos2").transform.GetChild(2).gameObject.GetComponent<DmgText>();
+                dmgText = GameObject.Find("EnemyPos2").transform.GetChild(1).gameObject.GetComponent<DmgText>();
                 break;
             case 2:
                 enemyUnit = enemyUnit3;
                 inimigoHUD = inimigoHUD3;
-                dmgText = GameObject.Find("EnemyPos3").transform.GetChild(2).gameObject.GetComponent<DmgText>();
+                dmgText = GameObject.Find("EnemyPos3").transform.GetChild(1).gameObject.GetComponent<DmgText>();
                 break;
             default:
                 enemyUnit = null;
@@ -170,7 +288,8 @@ public class SistemaBatalha : MonoBehaviour
         yield return new WaitForSeconds(timeActionsDialogue);
         playerAnimator.SetBool("isAttacking", false);
         enemyAnimator.SetBool("isTakeHit", false);
-        float dmg = playerUnit.InflictDmg();
+
+        float dmg = Personagem.InflictDmg();
         if(dmgText != null){
             dmgText.x = 0.5f;
             dmgText.y = 0.5f;
@@ -194,7 +313,8 @@ public class SistemaBatalha : MonoBehaviour
             enemyAnimator.SetBool("isDeath", true);
             enemyDeaths[enemyID] = 0;
         }
-        
+
+        UnityEngine.Debug.Log("ContDeath:"+contDeath);
         if(contDeath == 3){
             
             estado = Estados.GANHOU;
@@ -256,7 +376,7 @@ public class SistemaBatalha : MonoBehaviour
                     dmgText.UpdateDMG(dmg);
                     dmgText.ResetFadeOut();
                 }
-                isMorto = playerUnit.TakeDmg(dmg);
+                isMorto = Personagem.TakeDmg(dmg);
                 UpdateDialogueText("O ataque inimigo lhe causou "+dmg+ " de dano!");
                 
                 yield return new WaitForSeconds(timeActionsDialogue);
@@ -278,35 +398,35 @@ public class SistemaBatalha : MonoBehaviour
 
     }
  
-    IEnumerator EndBattle(){
+    void EndBattle(){
+      
         if(estado ==  Estados.GANHOU){
             UpdateDialogueText("Você venceu a batalha!");
-            playerUnit.GuardarMoedas(250);
-            playerUnit.GanharXP(20);
-            UpdateDialogueText("Você ganhou $"+250+" moedas e "+20+"xp");
-            yield return new WaitForSeconds(timeActionsDialogue);
-         
-            SceneManager.LoadScene("Mapa");
+            int moedasGanhas = enemyUnit1.moedas+enemyUnit1.moedas+enemyUnit1.moedas;
+            int xpGanho = enemyUnit1.xp+enemyUnit1.xp+enemyUnit1.xp;
+            Personagem.GuardarMoedas(moedasGanhas);
+            Personagem.GanharXP(xpGanho);
+            UpdateDialogueText("Você ganhou $"+moedasGanhas+" moedas e "+xpGanho+"xp");
+
+            
+            vitoria.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Moedas encontradas:" +moedasGanhas;
+            vitoria.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "Xp ganho:" +xpGanho;
+            vitoria.SetActive(true);
+            
+            //SceneManager.LoadScene("Mapa");
 
         }else if (estado == Estados.PERDEU){
             UpdateDialogueText("Sua invocação foi derrotada!");
 
-            yield return new WaitForSeconds(timeActionsDialogue);
-            GameObject bag = GameObject.Find("Odin_bag");
-            GameObject battle = GameObject.Find("Odin_battle");
-            GameObject canvas = GameObject.Find("CanvasDerrota");
-
-            bag.SetActive(false);
-            battle.SetActive(false);
-            canvas.SetActive(true);
+            odinBag.SetActive(false);
+            odinBattle.SetActive(false);
+            canvas.transform.GetChild(0).gameObject.SetActive(true);
         }
     }
 
     public void ChangeSceneToBag(){
         odinBag.SetActive(true);
         odinBattle.SetActive(false);
-        
-
         
     }
 }

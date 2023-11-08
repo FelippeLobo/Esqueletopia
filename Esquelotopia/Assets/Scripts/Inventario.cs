@@ -13,17 +13,13 @@ public class Inventario : MonoBehaviour
     public Personagem personagem;
     public void Start(){
         
-        
-        itens = new Item[25];
 
-        UnityEngine.Debug.Log(personagem.itensInventarios.Length);
-        UnityEngine.Debug.Log("Item: "+personagem.itensInventarios[0].nome);
-        UnityEngine.Debug.Log("Personagem: "+personagem.moedas);
+        itens = new Item[25];
         
-        for (int i = 0; i < personagem.itensInventarios.Length; i++)
+        for (int i = 0; i < Personagem.itensInventarios.Length; i++)
         {
             
-            itens[i] = personagem.itensInventarios[i];
+            itens[i] = Personagem.itensInventarios[i];
        
      
         }
@@ -32,8 +28,6 @@ public class Inventario : MonoBehaviour
         LoadItem();
 
     }
-
-
 
     public void DragItem(GameObject button){
         mouseItem = button;
@@ -51,7 +45,15 @@ public class Inventario : MonoBehaviour
         }
        
     }
-
+    void Update(){
+        for (int i = 0; i < Personagem.itensInventarios.Length; i++)
+        {
+            
+            itens[i] = Personagem.itensInventarios[i];
+       
+     
+        }
+    }
     public void LoadItem(){
         int[] cont = new int[25];
         int j = 0;

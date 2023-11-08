@@ -28,7 +28,7 @@ using System;
         };
 
         private int[] magias = {
-            10, 5, 30, 0, 5, 15, 10, 25, 10, 0, 20, 15, 25, 30, 5, 10, 30, 15, 20, 15, 25, 10, 15, 5, 15, 10, 25, 0, 5, 30, 15, 25, 10, 10,0
+            10, 5, 30, 0, 5, 15, 10, 25, 10, 0, 20, 15, 25, 30, 5, 10, 30, 15, 20, 15, 25, 10, 15, 5, 15, 10, 25, 0, 5, 30, 0, 0, 0, 0,0
         };
 
         private string[] imagens = {
@@ -69,7 +69,7 @@ using System;
 
              for (int i = 0; i < tam; i++)
             {
-                int j = (int)UnityEngine.Random.Range(0, tam);
+                int j = (int)UnityEngine.Random.Range(0, 35);
                 retorno[i] = itens[j];
                 
                 

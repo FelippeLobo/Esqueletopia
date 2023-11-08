@@ -7,12 +7,11 @@ namespace Project
 {
     public class BotaoAtaque : MonoBehaviour
     {
-        public Inimigo inimigo;
+        public GameObject inimigoPos;
+        private Inimigo inimigo;
 
         void Start(){
-             UnityEngine.Debug.Log(this.gameObject.name);
-              UnityEngine.Debug.Log(this.gameObject.tag);
-            UnityEngine.Debug.Log(transform.childCount);
+            inimigo = inimigoPos.transform.GetChild(2).gameObject.GetComponent<Inimigo>();
             transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = inimigo.nome + " Lvl " + inimigo.level;
         }
 

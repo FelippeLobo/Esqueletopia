@@ -11,21 +11,21 @@ public class Personagem : MonoBehaviour
     public string nome;
 
     public static GameObject instance = null;
-    public Item[] itensInventarios;
-    public Item[] itensEquipados;
+    public static Item[] itensInventarios;
+    public static Item[] itensEquipados;
 
-    public int level;
-    public int proxLevelXp;
-    public int moedas;
-    public float vidaTotal;
-    public float vidaAtual;
-    public int ataque;
-    public int defesa;
-    public int magia;
+    public static int level;
+    public static int proxLevelXp;
+    public static int moedas;
+    public static float vidaTotal;
+    public static float vidaAtual;
+    public static int ataque;
+    public static int defesa;
+    public static int magia;
     
     public HealthBar healthBar;
 
-    public ItensManager itensManager;
+    public static ItensManager itensManager;
 
     
      void Start()
@@ -45,18 +45,17 @@ public class Personagem : MonoBehaviour
     }
 
     public void StartInstance(){
-        Personagem personagem = instance.GetComponent<Personagem>();
-        nome = personagem.nome;
-        level = personagem.level;
-        vidaTotal = personagem.vidaTotal;
-        vidaAtual = personagem.vidaAtual;
+        /*nome = Personagem.nome;
+        level = Personagem.level;
+        vidaTotal = Personagem.vidaTotal;
+        vidaAtual = Personagem.vidaAtual;
         if(!(healthBar is null)){
             healthBar.SetMaxHealth(vidaTotal, vidaAtual);
         }
-        ataque = personagem.ataque;
-        defesa = personagem.defesa;
-        magia = personagem.magia;
-        moedas = personagem.moedas;
+        ataque = Personagem.ataque;
+        defesa = Personagem.defesa;
+        magia = Personagem.magia;
+        moedas = Personagem.moedas;
         //itensInventarios = personagem.itensInventarios;
         
         //itensEquipados = personagem.itensEquipados;
@@ -66,25 +65,26 @@ public class Personagem : MonoBehaviour
 
         for (int i = 0; i < 25; i++)
         {   
-            itensInventarios[i] = personagem.itensInventarios[i];                
+            itensInventarios[i] = Personagem.itensInventarios[i];                
         }
 
         for (var i = 0; i < 4; i++)
         {
-             itensEquipados[i] = personagem.itensEquipados[i];
-        }
+             itensEquipados[i] = Personagem.itensEquipados[i];
+        }*/
     }
 
     private void StartWithoutInstance(){
         
         level = 1;
-        vidaTotal = 50;
+        nome = "Invocação"; 
+        vidaTotal = 150;
         vidaAtual = vidaTotal;
         if(!(healthBar is null)){
             healthBar.SetMaxHealth(vidaTotal, vidaAtual);
         }
-        ataque = 20;
-        defesa = 10;
+        ataque = 15;
+        defesa = 50;
         magia = 0;
         moedas = 0;
         itensInventarios = new Item[25];
@@ -95,12 +95,17 @@ public class Personagem : MonoBehaviour
         }
 
         for (var i = 0; i < 4; i++){
+
             itensEquipados[i] = new Item(0, "", 0, 0, 0, 0, null);
         }
+        // for (int i = 0; i < 9; i++)
+        // {
+        //     LevelUp();
+        // }
 
         itensManager = new ItensManager();
-        ItemFactory();
-        GuardarMoedas(250);
+        Personagem.ItemFactory();
+        Personagem.GuardarMoedas(250);
     
     }
 
@@ -111,28 +116,56 @@ public class Personagem : MonoBehaviour
               healthBar.SetMaxHealth(vidaTotal, vidaAtual);
         }
         if(proxLevelXp >= 100){
-            proxLevelXp = 0;
+            proxLevelXp = proxLevelXp - 100;
             LevelUp(); 
         }
       
     }
 
-    public void EquipItens(Item[] itensEquipadosAux){
-        for (var i = 0; i < 4; i++)
+    public static void EquipItens(Item[] itensEquipadosAux){
+          for (int i = 0; i < 4; i++)
+    {
+        if (itensEquipados[i] != null && itensEquipados[i].id != 0)
         {
-                 if(!(itensEquipados[i] == null) && !(itensEquipados[i].id == 0)){
-                    vidaTotal-= itensEquipados[i].vida;
-                    ataque-= itensEquipados[i].ataque;
-                    defesa-= itensEquipados[i].defesa;
-                    magia-= itensEquipados[i].magia;
-                 }
-
-                itensEquipados[i] = itensEquipadosAux[i];
+           
+            vidaTotal -= itensEquipados[i].vida;
+            ataque -= itensEquipados[i].ataque;
+            defesa -= itensEquipados[i].defesa;
+            magia -= itensEquipados[i].magia;
         }
-        AtualizaStatus();
+
+
+        itensEquipados[i] = itensEquipadosAux[i];
     }
 
-    public void HealLife(){
+
+    List<int> idsDuplicados = new List<int>();
+
+
+       for (int i = 0; i < 25; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (itensInventarios[i] != null && itensEquipados[j] != null && itensInventarios[i].id == itensEquipados[j].id)
+            {
+                idsDuplicados.Add(itensInventarios[i].id);
+            }
+        }
+    }
+
+    for (int i = 0; i < 25; i++)
+    {
+        if (itensInventarios[i] != null && idsDuplicados.Contains(itensInventarios[i].id))
+        {
+            itensInventarios[i] = null;
+        }
+    }
+
+    
+    AtualizaStatus();
+    }
+
+    public static void HealLife(){
         proxLevelXp+=15;
         float cura = (float)Math.Ceiling(vidaTotal * 0.35f);
         float vidaFinal = vidaAtual + cura;
@@ -143,13 +176,14 @@ public class Personagem : MonoBehaviour
             vidaAtual = vidaTotal;
         }
     }
-    public void LevelUp(){
+    public static void LevelUp(){
         level++;
-        vidaTotal+=10*level;
+        vidaTotal+=15*level;
+        vidaAtual= vidaTotal;
         ataque+=5*level;
-        defesa+=5*level;
+        defesa+=10*level;
     }
-    public void Aprimorar(){
+    public static void Aprimorar(){
         UpdatePanel.atualizar = true;
         proxLevelXp+=15;
         vidaTotal+=10;
@@ -157,15 +191,15 @@ public class Personagem : MonoBehaviour
         ataque+=5;
         defesa+=5;
     }
-    public void GuardarMoedas(int valor){
+    public static void GuardarMoedas(int valor){
         moedas+= valor;
     }
 
-    public void GanharXP(int valor){
+    public static void GanharXP(int valor){
         proxLevelXp+=valor;
     }
 
-    public void ArmazenarItens(Item[] itens){
+    public static void ArmazenarItens(Item[] itens){
 
         for (var i = 0; i < itens.Length; i++)
         {
@@ -178,24 +212,21 @@ public class Personagem : MonoBehaviour
         }
     }
 
-    public void ArmazenarItem(Item item){
+    public static void ArmazenarItem(Item item){
 
-        int newTam = (itensInventarios.Length)+1;
-        Item[] newInventory = new Item[newTam];
-
-        for (var j = 0; j < newTam; j++)
+        for (var j = 0; j < 25; j++)
         {
-            if( j >= itensInventarios.Length ){
-                newInventory[j] = item;
-            }else{
-                newInventory[j] = itensInventarios[j];
-            }
-        } 
+            if(itensInventarios[j].id == 0){
+                itensInventarios[j] = item;
+                j=30;
+                break;
 
-        itensInventarios = newInventory;
+            }
+
+        } 
     }
 
-    public void AtualizaStatus(){
+    public static void AtualizaStatus(){
         for (var i = 0; i < 4; i++)
         {
             
@@ -208,9 +239,27 @@ public class Personagem : MonoBehaviour
         }
     }
 
- 
+    public static void ChestBonus(){
+        moedas+= UnityEngine.Random.Range(100,10000);
+        proxLevelXp+=  UnityEngine.Random.Range(10,100);
+        Item[] itemAux =  itensManager.CreateListaItem(UnityEngine.Random.Range(1,3));
+        int cont=0;
+        for (int i = 0; i < 25; i++)
+        {   
+            if(cont == itemAux.Length){
+                i=26;
+                break;
+            }
+         
+            if(itensInventarios[i].id == 0){
+              
+                itensInventarios[i] = itemAux[cont];  
+                cont++;
+            }        
+        }
+    }
 
-    public void ItemFactory(){
+    public static void ItemFactory(){
         
         Item[] itemAux = itensManager.CreateStartListaItem(2);   
    
@@ -227,11 +276,12 @@ public class Personagem : MonoBehaviour
            
     }
 
-    public bool TakeDmg(float dano){
+    public static bool TakeDmg(float dano){
         
         proxLevelXp+=1;
-        vidaAtual -= dano;
-        healthBar.SetHealth(vidaAtual);
+        float danoMitigado = (float)(Math.Ceiling((UnityEngine.Random.Range(0, (0.01f*level) * defesa/2))));
+        vidaAtual -= (dano - danoMitigado);
+            
         if(vidaAtual <= 0)
             return true;
         else
@@ -239,7 +289,7 @@ public class Personagem : MonoBehaviour
         
     }
 
-    public float InflictDmg(){
+    public static float InflictDmg(){
         
         proxLevelXp+=1;                                                
         return (float)(Math.Ceiling((UnityEngine.Random.Range(0, (float)(((ataque*(0.2*level)) + 5)+magia)))));

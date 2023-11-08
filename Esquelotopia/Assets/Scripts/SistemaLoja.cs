@@ -32,13 +32,14 @@ using System;
         private TextMeshProUGUI magia;
 
         void Start()
-        {
+        {   
+            personagem = GameObject.Find("PersonagemStats").GetComponent<Personagem>();
             moedas = GameObject.Find("MoneyMoney");
             alerta = GameObject.Find("Alerta");
 
-            moedas.GetComponent<TextMeshProUGUI>().text = "$"+personagem.moedas;
+            moedas.GetComponent<TextMeshProUGUI>().text = "$"+Personagem.moedas;
             itensVenda = new Item[qtdItens];
-            itensVenda = personagem.itensManager.CreateListaItem(qtdItens);
+            itensVenda = Personagem.itensManager.CreateListaItem(qtdItens);
 
             GameObject item = barraca.transform.GetChild(0).gameObject;
             UpdateItens(item, 0);
@@ -54,10 +55,10 @@ using System;
 
         public void ComprarItem(GameObject button){
             Item item = button.GetComponent<Item>();
-            if(personagem.moedas >= item.preco){
-                personagem.moedas -= item.preco;
-                moedas.GetComponent<TextMeshProUGUI>().text = "$"+personagem.moedas;
-                personagem.ArmazenarItem(item);
+            if(Personagem.moedas >= item.preco){
+                Personagem.moedas -= item.preco;
+                moedas.GetComponent<TextMeshProUGUI>().text = "$"+Personagem.moedas;
+                Personagem.ArmazenarItem(item);
                 button.GetComponent<Button>().interactable  = false;
             }else{
                 //alerta.GetComponent<DmgText>().ResetFadeOut();

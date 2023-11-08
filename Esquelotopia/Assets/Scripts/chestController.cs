@@ -10,6 +10,7 @@ public class chestController : MonoBehaviour
         if(other.gameObject.tag == "Player"){
             gameObject.GetComponent<SpriteRenderer>().sprite = openChest;
             gameObject.GetComponent<AudioSource>().Play();
+            Personagem.ChestBonus();
         }    
     }
 
