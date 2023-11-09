@@ -17,6 +17,9 @@ public class SistemaBatalha : MonoBehaviour
     public Transform playerPos;
     public Transform enemyPos;
     public HealthBar playerHUD;
+    public HealthBar playerXpHUD;
+
+    public HealthBar playerManaHUD;
     private static float timeActionsDialogue = 1.3f;
     public static Personagem playerUnit;
     public Animator playerAnimator;
@@ -44,7 +47,9 @@ public class SistemaBatalha : MonoBehaviour
 
     public GameObject Actions;
     public GameObject EnemySelection;
+    public GameObject Magias;
 
+    public GameObject healEffect;
   
     private InimigoHUD inimigoHUD;
 
@@ -60,6 +65,9 @@ public class SistemaBatalha : MonoBehaviour
 
         playerUnit = GameObject.Find("PersonagemStats").GetComponent<Personagem>(); 
         playerUnit.healthBar = playerHUD;
+
+        playerXpHUD.SetMaxHealth(100, Personagem.proxLevelXp);
+        playerManaHUD.SetMaxHealth(100, 0);
         int seedBackGround = (int)UnityEngine.Random.Range(1, 6);
         
         backgrounds.transform.GetChild(seedBackGround).gameObject.SetActive(true);
@@ -83,6 +91,10 @@ public class SistemaBatalha : MonoBehaviour
             estado = Estados.PERDEU;
             EndBattle();
         }
+        playerXpHUD.SetHealth(Personagem.proxLevelXp);
+        playerXpHUD.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "Lvl "+Personagem.level;
+
+        playerManaHUD.SetHealth(Personagem.manaPoints);
     }
     void SetEnemies(){
         inimigoPos1 = GameObject.Find("EnemyPos");
@@ -226,6 +238,28 @@ public class SistemaBatalha : MonoBehaviour
         }
         panelEnemy.SetActive(true);
     }
+    public void OnCurarButton(){
+        if(Personagem.manaPoints >= 25){
+            float cura = Personagem.HealLifeMagic();
+            DmgText dmgText =  GameObject.Find("Player").transform.GetChild(1).gameObject.GetComponent<DmgText>();
+            if(dmgText != null){
+                dmgText.x = -0.3f;
+                dmgText.y = 0;
+                dmgText.UpdateDMG(cura);
+                dmgText.ResetFadeOut();
+            }
+            UpdateDialogueText("Seu Necromante te curou em:");
+            estado = Estados.TURNO_INIMIGO;
+
+            healEffect.SetActive(true);
+            StartCoroutine(EnemyTurn());
+
+        }else{
+            UpdateDialogueText("Sem energia suficiente!");
+            Magias.SetActive(false);
+            Actions.SetActive(true);
+        }
+    }
     public void OnEnemyButton(int enemyID){
 
         if(enemyDeaths[enemyID] == 1){
@@ -240,7 +274,7 @@ public class SistemaBatalha : MonoBehaviour
     }
 
     public void Fugir(GameObject buttonFugir){
-        float vidaAux = Personagem.vidaTotal * 0.25f;
+        float vidaAux = (int)(Personagem.vidaTotal * 0.25f);
         Personagem.vidaAtual -= vidaAux;
         if(Personagem.vidaAtual > 0){
             Personagem.moedas -= (int)(Personagem.moedas * 0.1f );
@@ -290,20 +324,21 @@ public class SistemaBatalha : MonoBehaviour
         enemyAnimator.SetBool("isTakeHit", false);
 
         float dmg = Personagem.InflictDmg();
+        float dmgFinal = enemyUnit.TakeDmg(dmg);
         if(dmgText != null){
             dmgText.x = 0.5f;
             dmgText.y = 0.5f;
-            dmgText.UpdateDMG(dmg);
+            dmgText.UpdateDMG(-dmgFinal);
             dmgText.ResetFadeOut();
         }
-         
-        bool isMorto = enemyUnit.TakeDmg(dmg);
+        
+        bool isMorto = (enemyUnit.vidaAtual <= 0f);
         inimigoHUD.SetHP(enemyUnit.vidaAtual);
 
         
        
         
-        UpdateDialogueText("Seu ataque causou "+dmg+ " de dano!");
+        UpdateDialogueText("Seu ataque causou "+dmgFinal+ " de dano!");
 
 
         yield return new WaitForSeconds(timeActionsDialogue);
@@ -338,7 +373,11 @@ public class SistemaBatalha : MonoBehaviour
         DmgText dmgText;
         UpdateDialogueText("Turno dos inimigos, se proteja!");
         yield return new WaitForSeconds(0.3f);
-
+      
+        if(healEffect.active == true){
+             healEffect.SetActive(false);
+        }
+       
         for (int i = 0; i < 3; i++)
         {
             dmgText =  GameObject.Find("Player").transform.GetChild(0).gameObject.GetComponent<DmgText>();
@@ -370,20 +409,22 @@ public class SistemaBatalha : MonoBehaviour
                 enemyAnimator.SetBool("isAttacking", false);
                 playerAnimator.SetBool("isTakeHit", false);
                 float dmg = enemyUnit.InflictDmg();
+                float dmgFinal = Personagem.TakeDmg(dmg);
                  if(dmgText != null){
                     dmgText.x = -0.3f;
                     dmgText.y = 0;
-                    dmgText.UpdateDMG(dmg);
+                    dmgText.UpdateDMG(-dmgFinal);
                     dmgText.ResetFadeOut();
                 }
-                isMorto = Personagem.TakeDmg(dmg);
+                
+                isMorto = (Personagem.vidaAtual <= 0f);
                 UpdateDialogueText("O ataque inimigo lhe causou "+dmg+ " de dano!");
                 
                 yield return new WaitForSeconds(timeActionsDialogue);
             }
             
         }
-
+        Magias.SetActive(false);
         EnemySelection.SetActive(false);
         Actions.SetActive(true);
 
@@ -401,11 +442,13 @@ public class SistemaBatalha : MonoBehaviour
     void EndBattle(){
       
         if(estado ==  Estados.GANHOU){
+            Personagem.manaPoints = 0;
             UpdateDialogueText("Você venceu a batalha!");
             int moedasGanhas = enemyUnit1.moedas+enemyUnit1.moedas+enemyUnit1.moedas;
             int xpGanho = enemyUnit1.xp+enemyUnit1.xp+enemyUnit1.xp;
             Personagem.GuardarMoedas(moedasGanhas);
             Personagem.GanharXP(xpGanho);
+            playerXpHUD.SetHealth(Personagem.proxLevelXp);
             UpdateDialogueText("Você ganhou $"+moedasGanhas+" moedas e "+xpGanho+"xp");
 
             

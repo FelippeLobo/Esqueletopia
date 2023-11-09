@@ -15,6 +15,9 @@ public class Equipamentos : MonoBehaviour
     public int defesaStat;
     public int magiaStat;
 
+    public HealthBar barraVida;
+    public HealthBar barraXp;
+
     public Personagem personagem;
 
     // Start is called before the first frame update
@@ -25,6 +28,7 @@ public class Equipamentos : MonoBehaviour
         ataqueStat = Personagem.ataque;
         defesaStat = Personagem.defesa;
         magiaStat = Personagem.magia;
+
 
 
         item = new Item[4];
@@ -96,11 +100,13 @@ public class Equipamentos : MonoBehaviour
         defesaStat = Personagem.defesa;
         magiaStat = Personagem.magia;
 
-        blockText.transform.GetChild(0).GetComponent<HealthBar>().SetMaxHealth(vidaTotalStat, vidaAtualStat);
-        blockText.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "- Ataque: "+ ataqueStat;
-        blockText.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "- Defesa: "+ defesaStat;
-        blockText.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "- Magia: "+ magiaStat;
-
+        barraVida.SetMaxHealth(vidaTotalStat, vidaAtualStat);
+        barraXp.SetMaxHealth(100, Personagem.proxLevelXp);
+        barraXp.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "Lvl "+Personagem.level;
+        blockText.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "- Ataque: "+ ataqueStat;
+        blockText.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "- Defesa: "+ defesaStat;
+        blockText.transform.GetChild(4).GetComponent<TextMeshProUGUI>().text = "- Magia: "+ magiaStat;
+        blockText.transform.GetChild(5).transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = Personagem.moedas+"";
     }
 
 

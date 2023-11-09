@@ -13,6 +13,8 @@ using TMPro;
           private TextMeshProUGUI defesaText;
            private TextMeshProUGUI magiaText;
            private TextMeshProUGUI proxLevelText;
+           public HealthBar playerHealth;
+           public HealthBar playerXp;
 
            public static bool atualizar;
 
@@ -21,20 +23,23 @@ using TMPro;
         {
             //personagem = GameObject.Find("PersonagemStats").GetComponent<Personagem>();
             blockText = GameObject.Find("BlockText");
-            ataqueText = blockText.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-            defesaText = blockText.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
-            levelText = blockText.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-            magiaText = blockText.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-            proxLevelText = blockText.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+            ataqueText = blockText.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+            defesaText = blockText.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+            //levelText = blockText.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+            magiaText = blockText.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+            //proxLevelText = blockText.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
             atualizar = true;
         }
 
         // Update is called once per frame
         void Update()
         {
-            
-                levelText.text = "- Lvl: " + Personagem.level;
-                proxLevelText.text = "( "+Personagem.proxLevelXp +"xp / 100xp )";
+                playerHealth.SetMaxHealth(Personagem.vidaTotal, Personagem.vidaAtual);
+                playerXp.SetMaxHealth(100, Personagem.proxLevelXp);
+                playerXp.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "Lvl "+Personagem.level;
+                //
+                //levelText.text = "- Lvl: " + Personagem.level;
+                //proxLevelText.text = "( "+Personagem.proxLevelXp +"xp / 100xp )";
                 ataqueText.text = "- Ataque: " + Personagem.ataque;
                 defesaText.text = "- Defesa: " + Personagem.defesa;
                 magiaText.text = "- Magia: " + Personagem.magia;

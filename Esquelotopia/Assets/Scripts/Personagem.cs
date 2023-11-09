@@ -16,12 +16,14 @@ public class Personagem : MonoBehaviour
 
     public static int level;
     public static int proxLevelXp;
+    public static int manaPoints;
     public static int moedas;
     public static float vidaTotal;
     public static float vidaAtual;
     public static int ataque;
     public static int defesa;
     public static int magia;
+    public static int berserkStatus;
     
     public HealthBar healthBar;
 
@@ -78,6 +80,7 @@ public class Personagem : MonoBehaviour
         
         level = 1;
         nome = "Invocação"; 
+        manaPoints=0;
         vidaTotal = 150;
         vidaAtual = vidaTotal;
         if(!(healthBar is null)){
@@ -89,7 +92,7 @@ public class Personagem : MonoBehaviour
         moedas = 0;
         itensInventarios = new Item[25];
         itensEquipados = new Item[4];
-
+        berserkStatus = 0;
         for (var i = 0; i < 25; i++){
             itensInventarios[i] = new Item(0, "", 0, 0, 0, 0, null);
         }
@@ -98,7 +101,7 @@ public class Personagem : MonoBehaviour
 
             itensEquipados[i] = new Item(0, "", 0, 0, 0, 0, null);
         }
-        // for (int i = 0; i < 9; i++)
+        // for (int i = 0; i < 4; i++)
         // {
         //     LevelUp();
         // }
@@ -165,9 +168,35 @@ public class Personagem : MonoBehaviour
     AtualizaStatus();
     }
 
+    
+    public static float HealLifeMagic(){
+        proxLevelXp+=3;
+        manaPoints-=25;
+        float maxCura = (float)Math.Ceiling(vidaTotal * 0.75f);
+        float minCura = (float)Math.Ceiling(vidaTotal * 0.50f);
+        float cura = (int)UnityEngine.Random.Range(minCura, maxCura);
+        float vidaFinal = vidaAtual + cura;
+
+        if(vidaFinal < vidaTotal){
+            vidaAtual = vidaFinal; 
+           
+        }else{
+            vidaAtual = vidaTotal;
+        }
+
+         return cura;
+    }
+
+    public static void BerserkerBuffMagic(){
+
+
+
+    }
+
+
     public static void HealLife(){
         proxLevelXp+=15;
-        float cura = (float)Math.Ceiling(vidaTotal * 0.35f);
+        float cura = (float)Math.Ceiling(vidaTotal * 0.5f);
         float vidaFinal = vidaAtual + cura;
 
         if(vidaFinal < vidaTotal){
@@ -276,23 +305,43 @@ public class Personagem : MonoBehaviour
            
     }
 
-    public static bool TakeDmg(float dano){
+    public static float TakeDmg(float dano){
         
         proxLevelXp+=1;
+        manaPoints+= (int)(2 + (level*0.05f));
         float danoMitigado = (float)(Math.Ceiling((UnityEngine.Random.Range(0, (0.01f*level) * defesa/2))));
-        vidaAtual -= (dano - danoMitigado);
-            
-        if(vidaAtual <= 0)
-            return true;
-        else
-            return false;
+               float danoFinal = dano-danoMitigado;
+        if(danoFinal < 0){
+            danoFinal = 0;
+        }
+        vidaAtual -= (danoFinal);
+        
+       //healthBar.SetHealth(vidaAtual);
+  
+        return danoFinal;
         
     }
 
     public static float InflictDmg(){
         
-        proxLevelXp+=1;                                                
-        return (float)(Math.Ceiling((UnityEngine.Random.Range(0, (float)(((ataque*(0.2*level)) + 5)+magia)))));
+        proxLevelXp+=2;   
+        manaPoints+= (int)((10 + (level*0.5f)));
+        int probAcerto = UnityEngine.Random.Range(0, 100);   
+
+            if(probAcerto <= 5){
+                    return 0;
+
+            }else if(probAcerto >= 95){
+                float dano = (float)(((ataque*(0.2f*level)) + 5)+(magia*0.5f));
+                return dano*2;
+
+
+            }else{
+                float dano = (float)(((ataque*(0.2f*level)) + 5)+(magia*0.5f));
+                return (float)(Math.Ceiling((UnityEngine.Random.Range(dano-(dano*0.20f), dano+(dano*0.1f)))));
+            }
+
+        
     }                      
 
 }

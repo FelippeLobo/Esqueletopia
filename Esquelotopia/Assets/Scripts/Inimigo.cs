@@ -27,6 +27,15 @@ public class Inimigo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(nome == "Bandido" || nome=="Soldado Exilado" || nome == "Herói Renegado"){
+            transform.localPosition = new Vector3(0, 0, 0);
+        }else if(nome == "Saqueador"){
+            transform.localPosition = new Vector3(0, 0.5f, 0);
+        }else if(nome == "Slime"){
+            transform.localPosition = new Vector3(0, 0, 0);
+        }else{
+             transform.localPosition = new Vector3(0, 0.8f, 0);
+        }
         
     }
     public void LevelUpMonster(int lvl){
@@ -42,24 +51,34 @@ public class Inimigo : MonoBehaviour
         }
 
     }
-    public bool TakeDmg(float dano){
+    public float TakeDmg(float dano){
         
         float danoMitigado =  (float)(Math.Ceiling((UnityEngine.Random.Range(0, (0.01f*level) * defesa/2))));
-        
-        vidaAtual -= (dano-danoMitigado);
+        float danoFinal = dano-danoMitigado;
+        if(danoFinal < 0){
+            danoFinal = 0;
+        }
+        vidaAtual -= (danoFinal);
         
         healthBar.SetHealth(vidaAtual);
-        if(vidaAtual <= 0)
-            return true;
-        else
-            return false;
+  
+        return danoFinal;
         
     }
 
      public float InflictDmg(){
 
+                int probAcerto = UnityEngine.Random.Range(0, 100);   
 
-        return (float)(Math.Ceiling((UnityEngine.Random.Range(0, (float)((ataque*(0.15*level)) + 1)))));
+            if(probAcerto <= 5){
+                    return 0;
+
+            }else{
+                float dano =  (float)((ataque*(0.10f*level)));
+                return (float)(Math.Ceiling((UnityEngine.Random.Range(dano-(dano*0.20f), dano+(dano*0.1f)))));
+            }
+
+        
 
     }
 }

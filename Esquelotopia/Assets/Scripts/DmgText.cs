@@ -55,7 +55,7 @@ using TMPro;
                 }
         }
         public void UpdateDMG(float dmg){
-            this.gameObject.GetComponent<TextMeshProUGUI>().text = "-"+dmg;
+            this.gameObject.GetComponent<TextMeshProUGUI>().text = dmg+"";
         }
         public void FadeOutObject(){
             DmgText.fadeOut = true;

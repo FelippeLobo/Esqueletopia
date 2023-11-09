@@ -34,10 +34,10 @@ using System;
         void Start()
         {   
             personagem = GameObject.Find("PersonagemStats").GetComponent<Personagem>();
-            moedas = GameObject.Find("MoneyMoney");
+            moedas = GameObject.Find("Moedas");
             alerta = GameObject.Find("Alerta");
 
-            moedas.GetComponent<TextMeshProUGUI>().text = "$"+Personagem.moedas;
+            moedas.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = ""+Personagem.moedas;
             itensVenda = new Item[qtdItens];
             itensVenda = Personagem.itensManager.CreateListaItem(qtdItens);
 
