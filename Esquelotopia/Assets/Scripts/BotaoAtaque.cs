@@ -11,7 +11,7 @@ namespace Project
         private Inimigo inimigo;
 
         void Start(){
-            inimigo = inimigoPos.transform.GetChild(2).gameObject.GetComponent<Inimigo>();
+            inimigo = inimigoPos.transform.GetChild(3).gameObject.GetComponent<Inimigo>();
             transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = inimigo.nome + " Lvl " + inimigo.level;
         }
 

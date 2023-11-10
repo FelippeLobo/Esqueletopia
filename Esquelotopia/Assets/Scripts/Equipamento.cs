@@ -79,13 +79,22 @@ public class Equipamentos : MonoBehaviour
             }     
 
             for (int j = 0; j < 25; j++)
-            {
-                if(Personagem.itensInventarios[j].id == itemAux.id){
-                    Personagem.itensInventarios[j] = new Item(0, "", 0, 0, 0, 0, null);
-                    j=26;
-                    break;
+               {        
+                    if(Personagem.itensInventarios[j] == null ){
+                        Personagem.itensInventarios[j] = new Item(0, "", 0, 0, 0, 0, null);
+
+                    }else{
+                        if(Personagem.itensInventarios[j].id == itemAux.id){
+                            Personagem.itensInventarios[j] = new Item(0, "", 0, 0, 0, 0, null);
+                            j=26;
+                            break;
+                        }
+                    }
+
+                   
                 }
-            }
+              
+            
 
             item[i] = itemAux;
             

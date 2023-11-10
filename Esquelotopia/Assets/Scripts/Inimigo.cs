@@ -27,7 +27,7 @@ public class Inimigo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(nome == "Bandido" || nome=="Soldado Exilado" || nome == "Herói Renegado"){
+        if(nome == "Bandido" || nome=="Soldado Exilado" || nome == "Héroi Renegado"){
             transform.localPosition = new Vector3(0, 0, 0);
         }else if(nome == "Saqueador"){
             transform.localPosition = new Vector3(0, 0.5f, 0);
@@ -36,7 +36,6 @@ public class Inimigo : MonoBehaviour
         }else{
              transform.localPosition = new Vector3(0, 0.8f, 0);
         }
-        
     }
     public void LevelUpMonster(int lvl){
         for (var i = 0; i < lvl; i++)
@@ -74,7 +73,7 @@ public class Inimigo : MonoBehaviour
                     return 0;
 
             }else{
-                float dano =  (float)((ataque*(0.10f*level)));
+                float dano =  (float)((ataque*(0.10f*level)) + 10);
                 return (float)(Math.Ceiling((UnityEngine.Random.Range(dano-(dano*0.20f), dano+(dano*0.1f)))));
             }
 

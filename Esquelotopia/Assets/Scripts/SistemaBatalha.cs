@@ -24,6 +24,11 @@ public class SistemaBatalha : MonoBehaviour
     public static Personagem playerUnit;
     public Animator playerAnimator;
     public Animator enemyAnimator;
+
+    public GameObject raio1;
+    public GameObject raio2;
+    public GameObject raio3;
+
     private Inimigo enemyUnit1;
     private Inimigo enemyUnit2;
     private Inimigo enemyUnit3;
@@ -48,6 +53,7 @@ public class SistemaBatalha : MonoBehaviour
     public GameObject Actions;
     public GameObject EnemySelection;
     public GameObject Magias;
+    public GameObject flames;
 
     public GameObject healEffect;
   
@@ -95,6 +101,10 @@ public class SistemaBatalha : MonoBehaviour
         playerXpHUD.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "Lvl "+Personagem.level;
 
         playerManaHUD.SetHealth(Personagem.manaPoints);
+
+        if(Personagem.berserkTurns > 0){
+            flames.SetActive(true);
+        }
     }
     void SetEnemies(){
         inimigoPos1 = GameObject.Find("EnemyPos");
@@ -248,16 +258,170 @@ public class SistemaBatalha : MonoBehaviour
                 dmgText.UpdateDMG(cura);
                 dmgText.ResetFadeOut();
             }
-            UpdateDialogueText("Seu Necromante te curou em:");
+            UpdateDialogueText("Seu Necromante te curou em: +"+cura);
             estado = Estados.TURNO_INIMIGO;
 
             healEffect.SetActive(true);
             StartCoroutine(EnemyTurn());
 
         }else{
-            UpdateDialogueText("Sem energia suficiente!");
+            UpdateDialogueText("Energia Insuficiente!");
             Magias.SetActive(false);
             Actions.SetActive(true);
+        }
+    }
+    public void OnTempestadeAstralButtonAux(){
+        StartCoroutine(OnTempestadeAstralButton());
+    }
+    IEnumerator OnTempestadeAstralButton(){
+         if(Personagem.manaPoints >= 50){
+            Personagem.manaPoints-=50;
+            float danoArea = Personagem.TempestadeAstralMagic();
+            UpdateDialogueText("A Tempestade Astral de seu Necromante gerou "+danoArea+ " de dano!");
+            UpdateDialogueText("Veremos se seus inimigos conseguirão se defender!");
+
+            int m1 = 0;
+            int m2 = 0;
+            int m3 = 0;
+
+            int d100Inimigo1 = (int)UnityEngine.Random.Range(0, 100);
+            int d100Inimigo2 = (int)UnityEngine.Random.Range(0, 100);
+            int d100Inimigo3 = (int)UnityEngine.Random.Range(0, 100);
+
+            DmgText dmgText1 =  GameObject.Find("EnemyPos").transform.GetChild(1).gameObject.GetComponent<DmgText>();
+            DmgText dmgText2 =  GameObject.Find("EnemyPos2").transform.GetChild(1).gameObject.GetComponent<DmgText>();
+            DmgText dmgText3 =  GameObject.Find("EnemyPos3").transform.GetChild(1).gameObject.GetComponent<DmgText>();
+
+            Animator enemyAnimator1 = enemyUnit1.GetComponent<Animator>();
+            Animator enemyAnimator2 = enemyUnit2.GetComponent<Animator>();
+            Animator enemyAnimator3 = enemyUnit3.GetComponent<Animator>();
+
+            //Bloco de Animação
+            //Start Animação da Skill
+            
+            yield return new WaitForSeconds(timeActionsDialogue);
+
+            if(d100Inimigo1 <= 75){
+                raio1.SetActive(true);
+                enemyAnimator1.SetBool("isTakeHit", true);
+            }
+            if(d100Inimigo2 <= 75){
+                raio2.SetActive(true);
+                enemyAnimator2.SetBool("isTakeHit", true);
+            }
+            if(d100Inimigo3 <= 75){
+                raio3.SetActive(true);
+                enemyAnimator3.SetBool("isTakeHit", true);
+            }
+            
+
+            yield return new WaitForSeconds(timeActionsDialogue);
+            float dmgFinal1;
+            float dmgFinal2;
+            float dmgFinal3;
+
+            bool isMorto1;
+            bool isMorto2;
+            bool isMorto3;
+
+            //End Animação da Skill
+            if(d100Inimigo1 <= 75){
+                enemyAnimator1.SetBool("isTakeHit", false);
+                dmgFinal1 = enemyUnit1.TakeDmg(danoArea);
+
+                dmgText1.x = 0.5f;
+                dmgText1.y = 0.5f;
+                dmgText1.UpdateDMG(-dmgFinal1);
+                dmgText1.ResetFadeOut();
+
+                isMorto1 = (enemyUnit1.vidaAtual <= 0f);
+                inimigoHUD1.SetHP(enemyUnit1.vidaAtual);
+
+                UpdateDialogueText("A Tempestade Astral gerou "+dmgFinal1+ " de dano no "+enemyUnit1.nome);
+
+                if(isMorto1){
+                    contDeath++;
+                    m1++;
+                    enemyAnimator1.SetBool("isDeath", true);
+                    enemyDeaths[0] = 0;
+                }
+            }
+            if(d100Inimigo2 <= 75){
+                enemyAnimator2.SetBool("isTakeHit", false);
+                dmgFinal2 = enemyUnit2.TakeDmg(danoArea);
+
+                dmgText2.x = 0.5f;
+                dmgText2.y = 0.5f;
+                dmgText2.UpdateDMG(-dmgFinal2);
+                dmgText2.ResetFadeOut();
+
+                isMorto2 = (enemyUnit2.vidaAtual <= 0f);
+                inimigoHUD2.SetHP(enemyUnit2.vidaAtual);
+                UpdateDialogueText("A Tempestade Astral gerou "+dmgFinal2+ " de dano no "+enemyUnit2.nome);
+
+                if(isMorto2){
+                    contDeath++;
+                    m2++;
+                    enemyAnimator2.SetBool("isDeath", true);
+                    enemyDeaths[1] = 0;
+                }
+            }
+            if(d100Inimigo3 <= 75){
+                enemyAnimator3.SetBool("isTakeHit", false);
+                dmgFinal3 = enemyUnit3.TakeDmg(danoArea);
+
+                dmgText3.x = 0.5f;
+                dmgText3.y = 0.5f;
+                dmgText3.UpdateDMG(-dmgFinal3);
+                dmgText3.ResetFadeOut();
+
+                isMorto3 = (enemyUnit3.vidaAtual <= 0f);
+                inimigoHUD3.SetHP(enemyUnit3.vidaAtual);
+                UpdateDialogueText("A Tempestade Astral gerou "+dmgFinal3+ " de dano no "+enemyUnit3.nome);
+
+                if(isMorto3){
+                    contDeath++;
+                    m3++;
+                    enemyAnimator3.SetBool("isDeath", true);
+                    enemyDeaths[2] = 0;
+                }
+            }
+            
+            yield return new WaitForSeconds(timeActionsDialogue);
+
+            if(contDeath == 3 || (m1+m2+m3) == 3){
+                estado = Estados.GANHOU;
+                EndBattle();
+            }else{
+                estado = Estados.TURNO_INIMIGO;
+                StartCoroutine(EnemyTurn());
+            }
+        
+         }else{
+            UpdateDialogueText("Energia Insuficiente!");
+            Magias.SetActive(false);
+            Actions.SetActive(true);
+         }
+
+
+    }
+
+    public void OnBerserkButton(){
+
+        if(Personagem.manaPoints >= 80){
+            Personagem.manaPoints-= 80;
+            Personagem.BerserkerBuffMagic();
+            UpdateDialogueText("Seu Necromante invocou a Fúria do Berserker Caído!");
+            estado = Estados.TURNO_INIMIGO;
+
+            healEffect.SetActive(true);
+            StartCoroutine(EnemyTurn());
+
+        }else{
+            UpdateDialogueText("Energia Insuficiente!");
+            Magias.SetActive(false);
+            Actions.SetActive(true);
+
         }
     }
     public void OnEnemyButton(int enemyID){
@@ -359,11 +523,6 @@ public class SistemaBatalha : MonoBehaviour
             StartCoroutine(EnemyTurn());
 
         }
-
-        
-        
-       
-        
     }
 
     IEnumerator EnemyTurn(){
@@ -371,13 +530,23 @@ public class SistemaBatalha : MonoBehaviour
         Inimigo enemyUnit;
         bool isMorto = false;
         DmgText dmgText;
-        UpdateDialogueText("Turno dos inimigos, se proteja!");
         yield return new WaitForSeconds(0.3f);
+        UpdateDialogueText("Turno dos inimigos, se proteja!");
+       
       
         if(healEffect.active == true){
              healEffect.SetActive(false);
         }
-       
+        if(raio1.active == true){
+            raio1.SetActive(false);
+        }
+        if(raio2.active == true){
+            raio2.SetActive(false);
+        }
+        if(raio3.active == true){
+            raio3.SetActive(false);
+        }
+
         for (int i = 0; i < 3; i++)
         {
             dmgText =  GameObject.Find("Player").transform.GetChild(0).gameObject.GetComponent<DmgText>();
@@ -438,11 +607,13 @@ public class SistemaBatalha : MonoBehaviour
         }
 
     }
- 
+    public void EnemyTakeHit(Animator enemyAnimator, Inimigo enemy, float dmg){
+
+
+    }
     void EndBattle(){
       
         if(estado ==  Estados.GANHOU){
-            Personagem.manaPoints = 0;
             UpdateDialogueText("Você venceu a batalha!");
             int moedasGanhas = enemyUnit1.moedas+enemyUnit1.moedas+enemyUnit1.moedas;
             int xpGanho = enemyUnit1.xp+enemyUnit1.xp+enemyUnit1.xp;
@@ -451,7 +622,8 @@ public class SistemaBatalha : MonoBehaviour
             playerXpHUD.SetHealth(Personagem.proxLevelXp);
             UpdateDialogueText("Você ganhou $"+moedasGanhas+" moedas e "+xpGanho+"xp");
 
-            
+            Personagem.berserkTurns = 0;
+
             vitoria.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "Moedas encontradas:" +moedasGanhas;
             vitoria.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "Xp ganho:" +xpGanho;
             vitoria.SetActive(true);

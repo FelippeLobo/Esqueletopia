@@ -57,7 +57,7 @@ using System;
             Item item = button.GetComponent<Item>();
             if(Personagem.moedas >= item.preco){
                 Personagem.moedas -= item.preco;
-                moedas.GetComponent<TextMeshProUGUI>().text = "$"+Personagem.moedas;
+                moedas.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "$"+Personagem.moedas;
                 Personagem.ArmazenarItem(item);
                 button.GetComponent<Button>().interactable  = false;
             }else{

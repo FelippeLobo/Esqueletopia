@@ -22,8 +22,12 @@ public class Personagem : MonoBehaviour
     public static float vidaAtual;
     public static int ataque;
     public static int defesa;
+    
+    private static int ataqueAux;
+    private static int defesaAux;
     public static int magia;
-    public static int berserkStatus;
+    public static bool berserkStatus;
+    public static int berserkTurns;
     
     public HealthBar healthBar;
 
@@ -87,12 +91,14 @@ public class Personagem : MonoBehaviour
             healthBar.SetMaxHealth(vidaTotal, vidaAtual);
         }
         ataque = 15;
+        ataqueAux = 0;
+        defesaAux = 0;
         defesa = 50;
         magia = 0;
         moedas = 0;
         itensInventarios = new Item[25];
         itensEquipados = new Item[4];
-        berserkStatus = 0;
+        berserkTurns = 0;
         for (var i = 0; i < 25; i++){
             itensInventarios[i] = new Item(0, "", 0, 0, 0, 0, null);
         }
@@ -122,7 +128,15 @@ public class Personagem : MonoBehaviour
             proxLevelXp = proxLevelXp - 100;
             LevelUp(); 
         }
-      
+        if(manaPoints >= 100){
+            manaPoints = 100;
+        }
+        if(berserkTurns == 0 && ataqueAux > 0 && defesaAux > 0){
+            ataque = ataqueAux;
+            defesa = defesaAux;
+            ataqueAux = 0;
+            defesaAux = 0;
+        }      
     }
 
     public static void EquipItens(Item[] itensEquipadosAux){
@@ -186,10 +200,25 @@ public class Personagem : MonoBehaviour
 
          return cura;
     }
+    public static float TempestadeAstralMagic(){
+        
+        float scaling = UnityEngine.Random.Range(75, 200);
+        float danoBase = (50 * level) + (magia*0.2f);
+        
+        float danoFinal = danoBase * (scaling / 100);
+
+        return (int)danoFinal;
+
+    }
 
     public static void BerserkerBuffMagic(){
 
-
+        berserkTurns = 3;
+        ataqueAux = ataque;
+        defesaAux = defesa;
+        vidaAtual = vidaTotal;
+        ataque = ataque * 5;
+        defesa = defesa * 5;
 
     }
 
@@ -314,16 +343,27 @@ public class Personagem : MonoBehaviour
         if(danoFinal < 0){
             danoFinal = 0;
         }
-        vidaAtual -= (danoFinal);
+
+        if(berserkTurns > 0){
+            vidaAtual -= (danoFinal/2);
+            return danoFinal/2;
+        }else{
+            vidaAtual -= (danoFinal);
+            return danoFinal;
+        }
+     
         
        //healthBar.SetHealth(vidaAtual);
   
-        return danoFinal;
+       
         
     }
 
     public static float InflictDmg(){
         
+        if(berserkTurns != 0){
+            berserkTurns--;
+        }
         proxLevelXp+=2;   
         manaPoints+= (int)((10 + (level*0.5f)));
         int probAcerto = UnityEngine.Random.Range(0, 100);   
@@ -332,7 +372,7 @@ public class Personagem : MonoBehaviour
                     return 0;
 
             }else if(probAcerto >= 95){
-                float dano = (float)(((ataque*(0.2f*level)) + 5)+(magia*0.5f));
+                float dano = (float)(((ataque*(0.2f*level)) + 5)+(magia*0.1f));
                 return dano*2;
 
 
