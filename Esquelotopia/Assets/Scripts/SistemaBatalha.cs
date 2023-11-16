@@ -66,6 +66,8 @@ public class SistemaBatalha : MonoBehaviour
 
     private List<GameObject> inimigos;
     public GameObject backgrounds;
+
+    public bool isBoss;
     void Start()
     {   
 
@@ -85,6 +87,13 @@ public class SistemaBatalha : MonoBehaviour
         enemyDeaths[1] = 1;
         enemyDeaths[2] = 1;
         contDeath = 0;
+
+        if(isBoss){
+            contDeath = 2;
+            enemyDeaths[0] = 0;
+            enemyDeaths[2] = 0;
+
+        }
         playerAnimator =  GameObject.Find("Player").GetComponent<Animator>();
         estado =  Estados.INICIO;
 
@@ -107,6 +116,7 @@ public class SistemaBatalha : MonoBehaviour
         }
     }
     void SetEnemies(){
+        if(!isBoss){
         inimigoPos1 = GameObject.Find("EnemyPos");
         inimigoPos2 = GameObject.Find("EnemyPos2");
         inimigoPos3 = GameObject.Find("EnemyPos3");
@@ -172,9 +182,9 @@ public class SistemaBatalha : MonoBehaviour
         enemyUnit3 = enemy3.GetComponent<Inimigo>();
 
         if(Personagem.level > 2){
-            enemyUnit1.LevelUpMonster((int)UnityEngine.Random.Range(1, Personagem.level+1));
-            enemyUnit2.LevelUpMonster((int)UnityEngine.Random.Range(1, Personagem.level+1));
-            enemyUnit3.LevelUpMonster((int)UnityEngine.Random.Range(1, Personagem.level+1));
+            enemyUnit1.LevelUpMonster((int)UnityEngine.Random.Range(Personagem.level-1, Personagem.level+1));
+            enemyUnit2.LevelUpMonster((int)UnityEngine.Random.Range(Personagem.level-1, Personagem.level+1));
+            enemyUnit3.LevelUpMonster((int)UnityEngine.Random.Range(Personagem.level-1, Personagem.level+1));
         }
        
         // enemyUnit1.LevelUpMonster(10);
@@ -185,7 +195,12 @@ public class SistemaBatalha : MonoBehaviour
         enemyUnit2.healthBar = inimigoHUD2.transform.GetChild(0).gameObject.GetComponent<HealthBar>();
         enemyUnit3.healthBar = inimigoHUD3.transform.GetChild(0).gameObject.GetComponent<HealthBar>();
 
-
+        }else{
+            inimigoPos2 = GameObject.Find("EnemyPos2");
+            enemyUnit2 = inimigoPos2.transform.GetChild(3).GetComponent<Inimigo>();
+            enemyUnit2.LevelUpMonster(14);
+            enemyUnit2.healthBar = inimigoHUD2.transform.GetChild(0).gameObject.GetComponent<HealthBar>();
+        }
 
     }
     void UpdateFromDataStore(){
@@ -210,14 +225,22 @@ public class SistemaBatalha : MonoBehaviour
        //GameObject enemyGo = Instantiate(enemyPrefab, enemyPos);
        //enemyUnit = enemyGo.GetComponent<Inimigo>();
         if(estado == Estados.INICIO){
+            if(!isBoss){
             UpdateDialogueText("Inimigos entraram em combate!");
+            }else{
+            UpdateDialogueText("O boss "+ enemyUnit2.nome +" entrou em combate!");     
+            }
           
 
             estado = Estados.TURNO_JOGADOR;
         }
+        if(!isBoss){
             inimigoHUD1.SetHUD(enemyUnit1);
             inimigoHUD2.SetHUD(enemyUnit2);
             inimigoHUD3.SetHUD(enemyUnit3);
+        }else{
+            inimigoHUD2.SetHUD(enemyUnit2);
+        }
             yield return new WaitForSeconds(timeActionsDialogue);
       
     
@@ -301,7 +324,7 @@ public class SistemaBatalha : MonoBehaviour
             
             yield return new WaitForSeconds(timeActionsDialogue);
 
-            if(d100Inimigo1 <= 75){
+            if(d100Inimigo1 <= 75 && isBoss == false){
                 raio1.SetActive(true);
                 enemyAnimator1.SetBool("isTakeHit", true);
             }
@@ -309,7 +332,7 @@ public class SistemaBatalha : MonoBehaviour
                 raio2.SetActive(true);
                 enemyAnimator2.SetBool("isTakeHit", true);
             }
-            if(d100Inimigo3 <= 75){
+            if(d100Inimigo3 <= 75 && isBoss == false){
                 raio3.SetActive(true);
                 enemyAnimator3.SetBool("isTakeHit", true);
             }
@@ -325,7 +348,7 @@ public class SistemaBatalha : MonoBehaviour
             bool isMorto3;
 
             //End Animação da Skill
-            if(d100Inimigo1 <= 75){
+            if(d100Inimigo1 <= 75 && isBoss == false){
                 enemyAnimator1.SetBool("isTakeHit", false);
                 dmgFinal1 = enemyUnit1.TakeDmg(danoArea);
 
@@ -366,7 +389,7 @@ public class SistemaBatalha : MonoBehaviour
                     enemyDeaths[1] = 0;
                 }
             }
-            if(d100Inimigo3 <= 75){
+            if(d100Inimigo3 <= 75  && isBoss == false){
                 enemyAnimator3.SetBool("isTakeHit", false);
                 dmgFinal3 = enemyUnit3.TakeDmg(danoArea);
 
@@ -389,7 +412,7 @@ public class SistemaBatalha : MonoBehaviour
             
             yield return new WaitForSeconds(timeActionsDialogue);
 
-            if(contDeath == 3 || (m1+m2+m3) == 3){
+            if(contDeath == 3 || ((m1+m2+m3) == 3 && isBoss == false) || ((m2) == 1 && isBoss == true) ){
                 estado = Estados.GANHOU;
                 EndBattle();
             }else{
@@ -436,8 +459,10 @@ public class SistemaBatalha : MonoBehaviour
         }
       
     }
-
-    public void Fugir(GameObject buttonFugir){
+    public void OnFugir(GameObject buttonFugir){
+        StartCoroutine(Fugir(buttonFugir));
+    }
+    IEnumerator Fugir(GameObject buttonFugir){
         float vidaAux = (int)(Personagem.vidaTotal * 0.25f);
         Personagem.vidaAtual -= vidaAux;
         if(Personagem.vidaAtual > 0){
@@ -445,6 +470,7 @@ public class SistemaBatalha : MonoBehaviour
             buttonFugir.GetComponent<ButtonUI>().StartGameButton();
         }else{
             playerAnimator.SetBool("isDeath", true);
+            yield return new WaitForSeconds(timeActionsDialogue);
             estado = Estados.PERDEU;
             EndBattle();
         }
@@ -587,7 +613,7 @@ public class SistemaBatalha : MonoBehaviour
                 }
                 
                 isMorto = (Personagem.vidaAtual <= 0f);
-                UpdateDialogueText("O ataque inimigo lhe causou "+dmg+ " de dano!");
+                UpdateDialogueText("O ataque inimigo lhe causou "+dmgFinal+ " de dano!");
                 
                 yield return new WaitForSeconds(timeActionsDialogue);
             }

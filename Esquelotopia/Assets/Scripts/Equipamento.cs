@@ -68,7 +68,8 @@ public class Equipamentos : MonoBehaviour
     }
 
     public void UpdateStatus(){
-        
+        bool flag = false;
+        int cont = 0;
         for (int i = 0; i < 4; i++)
         {
             GameObject slot = equipamento.transform.GetChild(i).gameObject;
@@ -77,30 +78,37 @@ public class Equipamentos : MonoBehaviour
             if (itemAux is null){
                 itemAux = slot.transform.GetChild(1).gameObject.GetComponent<Item>();
             }     
-
+            
             for (int j = 0; j < 25; j++)
                {        
-                    if(Personagem.itensInventarios[j] == null ){
-                        Personagem.itensInventarios[j] = new Item(0, "", 0, 0, 0, 0, null);
+                    
 
-                    }else{
+                        
                         if(Personagem.itensInventarios[j].id == itemAux.id){
                             Personagem.itensInventarios[j] = new Item(0, "", 0, 0, 0, 0, null);
                             j=26;
                             break;
                         }
-                    }
+                    
 
                    
                 }
               
             
-
-            item[i] = itemAux;
+            if(item[i].id != itemAux.id){
+                  item[i] = itemAux;
+            }else{
+                cont++;
+            }
+          
             
 
         }
 
+        UnityEngine.Debug.Log("CONT:"+cont);
+
+
+       
         Personagem.EquipItens(item);
 
         vidaAtualStat = Personagem.vidaAtual;
@@ -108,7 +116,7 @@ public class Equipamentos : MonoBehaviour
         ataqueStat = Personagem.ataque;
         defesaStat = Personagem.defesa;
         magiaStat = Personagem.magia;
-
+        
         barraVida.SetMaxHealth(vidaTotalStat, vidaAtualStat);
         barraXp.SetMaxHealth(100, Personagem.proxLevelXp);
         barraXp.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "Lvl "+Personagem.level;

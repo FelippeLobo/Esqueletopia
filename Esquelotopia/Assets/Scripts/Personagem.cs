@@ -30,7 +30,6 @@ public class Personagem : MonoBehaviour
     public static int berserkTurns;
     
     public HealthBar healthBar;
-
     public static ItensManager itensManager;
 
     
@@ -82,20 +81,27 @@ public class Personagem : MonoBehaviour
 
     private void StartWithoutInstance(){
         
-        level = 1;
+       
         nome = "Invocação"; 
-        manaPoints=0;
-        vidaTotal = 150;
+
+        level = 1;
+        vidaTotal = 100;
         vidaAtual = vidaTotal;
-        if(!(healthBar is null)){
-            healthBar.SetMaxHealth(vidaTotal, vidaAtual);
-        }
-        ataque = 15;
+        ataque = 25;
+        defesa = 15;
+        magia = 5;
+
+        moedas = 0;
+        manaPoints = 0;
+
         ataqueAux = 0;
         defesaAux = 0;
-        defesa = 50;
-        magia = 0;
-        moedas = 0;
+
+        if (!(healthBar is null))
+        {
+            healthBar.SetMaxHealth(vidaTotal, vidaAtual);
+        }
+
         itensInventarios = new Item[25];
         itensEquipados = new Item[4];
         berserkTurns = 0;
@@ -186,8 +192,8 @@ public class Personagem : MonoBehaviour
     public static float HealLifeMagic(){
         proxLevelXp+=3;
         manaPoints-=25;
-        float maxCura = (float)Math.Ceiling(vidaTotal * 0.75f);
-        float minCura = (float)Math.Ceiling(vidaTotal * 0.50f);
+        float maxCura = (float)Math.Ceiling(vidaTotal * 0.50f);
+        float minCura = (float)Math.Ceiling(vidaTotal * 0.35f);
         float cura = (int)UnityEngine.Random.Range(minCura, maxCura);
         float vidaFinal = vidaAtual + cura;
 
@@ -202,8 +208,8 @@ public class Personagem : MonoBehaviour
     }
     public static float TempestadeAstralMagic(){
         
-        float scaling = UnityEngine.Random.Range(75, 200);
-        float danoBase = (50 * level) + (magia*0.2f);
+        float scaling = UnityEngine.Random.Range(75, 150);
+        float danoBase = ((ataque*0.5f) * (1 + level/10)) + (magia*1.5f);
         
         float danoFinal = danoBase * (scaling / 100);
 
@@ -216,9 +222,8 @@ public class Personagem : MonoBehaviour
         berserkTurns = 3;
         ataqueAux = ataque;
         defesaAux = defesa;
-        vidaAtual = vidaTotal;
-        ataque = ataque * 5;
-        defesa = defesa * 5;
+        ataque += (int)(ataque*1.5f);
+        defesa += (int)(defesa*1.5f);
 
     }
 
@@ -236,10 +241,11 @@ public class Personagem : MonoBehaviour
     }
     public static void LevelUp(){
         level++;
-        vidaTotal+=15*level;
+        vidaTotal+=10;
         vidaAtual= vidaTotal;
-        ataque+=5*level;
-        defesa+=10*level;
+        ataque+=2;
+        defesa+=1;
+        magia += 1;
     }
     public static void Aprimorar(){
         UpdatePanel.atualizar = true;
@@ -338,18 +344,19 @@ public class Personagem : MonoBehaviour
         
         proxLevelXp+=1;
         manaPoints+= (int)(2 + (level*0.05f));
-        float danoMitigado = (float)(Math.Ceiling((UnityEngine.Random.Range(0, (0.01f*level) * defesa/2))));
-               float danoFinal = dano-danoMitigado;
-        if(danoFinal < 0){
-            danoFinal = 0;
+        float danoMitigadoBase = dano - (((defesa*0.8f) + (magia*0.2f)) / (2 * (1 + (level / 10))));
+        float danoMitigado = (float)(Math.Ceiling((UnityEngine.Random.Range(danoMitigadoBase - (danoMitigadoBase * 0.1f), danoMitigadoBase + (danoMitigadoBase * 0.1f)))));
+
+        if(danoMitigado < 0){
+            danoMitigado = 0;
         }
 
         if(berserkTurns > 0){
-            vidaAtual -= (danoFinal/2);
-            return danoFinal/2;
+            vidaAtual -= (int)(danoMitigado/2);
+            return danoMitigado/2;
         }else{
-            vidaAtual -= (danoFinal);
-            return danoFinal;
+            vidaAtual -= (int)(danoMitigado);
+            return danoMitigado;
         }
      
         
@@ -366,19 +373,22 @@ public class Personagem : MonoBehaviour
         }
         proxLevelXp+=2;   
         manaPoints+= (int)((10 + (level*0.5f)));
+
+
         int probAcerto = UnityEngine.Random.Range(0, 100);   
 
             if(probAcerto <= 5){
                     return 0;
 
-            }else if(probAcerto >= 95){
-                float dano = (float)(((ataque*(0.2f*level)) + 5)+(magia*0.1f));
+            }else if(probAcerto >= 95){ 
+
+                float dano = (float)((((ataque*0.60f)+ (magia*0.25f))*(1 + level/10)));
                 return dano*2;
 
 
             }else{
-                float dano = (float)(((ataque*(0.2f*level)) + 5)+(magia*0.5f));
-                return (float)(Math.Ceiling((UnityEngine.Random.Range(dano-(dano*0.20f), dano+(dano*0.1f)))));
+                float dano = (float)((ataque*0.60f)+ (magia*0.25f)*(1 + level/10));
+                return (float)(Math.Ceiling((UnityEngine.Random.Range(dano - (dano * 0.1f), dano + (dano * 0.1f))))); ;
             }
 
         

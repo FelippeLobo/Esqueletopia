@@ -11,23 +11,31 @@ public class Inimigo : MonoBehaviour
     public int level;
     public float vidaTotal;
     public float vidaAtual;
-    public int ataque;
-    public int defesa;
+    public float ataque;
+    public float defesa;
     public int moedas;
     public int xp;
+
+    private float ataqueBase;
+    private float defesaBase;
+    private float vidaTotalBase;
 
 
       public HealthBar healthBar;
     // Start is called before the first frame update
     void Start()
     {
+        ataqueBase = ataque;
+        defesaBase = defesa;
+        vidaTotalBase = vidaTotal;
+        DuzentosAnosDeBalanceamentoRiotGames();
         healthBar.SetMaxHealth(vidaTotal, vidaAtual);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(nome == "Bandido" || nome=="Soldado Exilado" || nome == "Héroi Renegado"){
+        if(nome == "Bandido" || nome=="Soldado Exilado" || nome == "Héroi Renegado" || nome == "Demon Slime"){
             transform.localPosition = new Vector3(0, 0, 0);
         }else if(nome == "Saqueador"){
             transform.localPosition = new Vector3(0, 0.5f, 0);
@@ -36,45 +44,57 @@ public class Inimigo : MonoBehaviour
         }else{
              transform.localPosition = new Vector3(0, 0.8f, 0);
         }
+ 
+    }
+    public void DuzentosAnosDeBalanceamentoRiotGames()
+    {
+        for (var i = 0; i < 2; i++)
+        {
+            vidaTotal += (vidaTotalBase * 0.5f);
+            vidaAtual = vidaTotal;
+            ataque += (ataqueBase * 0.65f);
+            defesa += (defesaBase * 0.60f);
+        }
     }
     public void LevelUpMonster(int lvl){
         for (var i = 0; i < lvl; i++)
         {   
             level++;
-            vidaTotal+=10*level;
+            vidaTotal+= (vidaTotalBase * 0.5f);
             vidaAtual= vidaTotal;
-            ataque+=10*level;
-            defesa+=10*level;
-            moedas+=150*level;
-            xp+=15;
-        }
+            ataque+= (ataqueBase * 0.65f);
+            defesa+=(defesaBase * 0.60f);
 
+            moedas+=150;
+            xp += 1;
+        }
     }
     public float TakeDmg(float dano){
-        
-        float danoMitigado =  (float)(Math.Ceiling((UnityEngine.Random.Range(0, (0.01f*level) * defesa/2))));
-        float danoFinal = dano-danoMitigado;
-        if(danoFinal < 0){
-            danoFinal = 0;
+
+        float danoMitigadoBase = dano - ((defesa / 2) * (1 + (Personagem.level / 10)));
+        float danoMitigado = (float)(Math.Ceiling((UnityEngine.Random.Range(danoMitigadoBase - (danoMitigadoBase * 0.1f), danoMitigadoBase + (danoMitigadoBase * 0.1f)))));
+
+        if(danoMitigado < 0){
+            danoMitigado = 0;
         }
-        vidaAtual -= (danoFinal);
+        vidaAtual -= (danoMitigado);
         
         healthBar.SetHealth(vidaAtual);
   
-        return danoFinal;
+        return danoMitigado;
         
     }
 
      public float InflictDmg(){
 
-                int probAcerto = UnityEngine.Random.Range(0, 100);   
+            int probAcerto = UnityEngine.Random.Range(0, 100);   
 
             if(probAcerto <= 5){
                     return 0;
 
             }else{
-                float dano =  (float)((ataque*(0.10f*level)) + 10);
-                return (float)(Math.Ceiling((UnityEngine.Random.Range(dano-(dano*0.20f), dano+(dano*0.1f)))));
+                float dano =  (ataque* 0.55f);
+                return (float)(Math.Ceiling((UnityEngine.Random.Range(dano-(dano*0.1f), dano+(dano*0.1f)))));
             }
 
         

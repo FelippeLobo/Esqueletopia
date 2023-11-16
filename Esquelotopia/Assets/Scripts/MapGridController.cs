@@ -481,7 +481,7 @@ public class MapGridController : MonoBehaviour
                 SceneManager.LoadScene("Backup");
                 break;
             case "boss":
-                SceneManager.LoadScene("Sala");
+                SceneManager.LoadScene("BossFight");
                 break;
             case "shop":
                 SceneManager.LoadScene("Shop");
