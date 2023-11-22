@@ -175,6 +175,11 @@ public class MapGridController : MonoBehaviour
         }
     }
 
+    public void resetLevel(){
+        DestroyObject(instance);
+        SceneManager.LoadScene("Initial_Screen");
+    }
+
     public void verifyPathTaken(int[] pathPosition){
         int pathX = pathPosition[0];
         int pathY = pathPosition[1];
